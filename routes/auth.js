@@ -1,3 +1,0 @@
-/*
-    Login / Registration locgic
-*/
