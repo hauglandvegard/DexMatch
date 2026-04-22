@@ -25,11 +25,13 @@ A dating app for Pokémon to find their true mate.
 3. Install the dependencies: `npm install`
 
 **To run in Development Mode (Recommended for testing):**
+
 This mode uses `ts-node` and `nodemon` to automatically restart the server when files change.
 1. Run: `npm run dev`
 2. Open your web browser and go to: `http://localhost:3000`
 
 **To run in Production Mode:**
+
 This mode compiles the TypeScript code into optimized JavaScript before running.
 1. Compile the code: `npm run build`
 2. Start the server: `npm start`
