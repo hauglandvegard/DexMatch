@@ -1,7 +1,7 @@
 # DexMatch
 A dating app for Pokémon to find their true mate.
 
-## Overview
+### Overview
 
 1. [Building](#building)
     1. [Prerequisites](#prerequisites)
@@ -19,19 +19,23 @@ A dating app for Pokémon to find their true mate.
 * Node.js (v18 or higher)
 * NPM (Node Package Manager)
 
+<br>
+
 ### How to Run the App (Local Development)
 1. Clone this repository to your local machine.
 2. Open your terminal and navigate to the project folder: `cd dexmatch`
 3. Install the dependencies: `npm install`
 
-**To run in Development Mode (Recommended for testing):**
+<br>
 
+#### Development Mode (Recommended for testing):
 This mode uses `ts-node` and `nodemon` to automatically restart the server when files change.
 1. Run: `npm run dev`
 2. Open your web browser and go to: `http://localhost:3000`
 
-**To run in Production Mode:**
+<br>
 
+#### Production Mode:
 This mode compiles the TypeScript code into optimized JavaScript before running.
 1. Compile the code: `npm run build`
 2. Start the server: `npm start`
@@ -62,8 +66,8 @@ This application is built using a Server-Side Rendered (SSR) architecture follow
 * **[PokeAPI](https://pokeapi.co/):** Provides *all the Pokémon data you'll ever need in one place*.
 * **[Chuck Norris API](https://api.chucknorris.io/):** Provides the thematic jokes based on Pokémon typing.
 
-### Use Case Diagram
-A high-level overview of the buisiness requirements.
+### System Context Diagram
+A high-level overview of the business requirements.
 
 ```mermaid
 flowchart LR
@@ -97,7 +101,7 @@ flowchart LR
     UC5 --> Database 
     
 ```
-  
+
 ### Entity-Relationship Diagram
 How the database tables relate to each other.
 
@@ -144,7 +148,6 @@ erDiagram
 
 ### Sequence Diagram
 
-
 ```mermaid
 sequenceDiagram
     participant U as User Browser
@@ -156,7 +159,7 @@ sequenceDiagram
     U->>S: GET /swipe
     S->>DB: Get preferences & past swipes
     DB-->>S: Returns user data
-    S->>PAPI: Fetch psudo random valid Pokemon ID
+    S->>PAPI: Fetch pseudo random valid Pokemon ID
     PAPI-->>S: Returns Pokemon Data (i.e. Type: Fire)
     S->>CNAPI: Fetch joke for "Fire"
     CNAPI-->>S: Returns Joke
