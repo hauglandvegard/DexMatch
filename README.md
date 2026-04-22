@@ -147,6 +147,7 @@ erDiagram
 ```
 
 ### Sequence Diagram
+Maps out the data flow and orchestration for the core swipe action. It details the step-by-step sequence of internal SQLite queries and external API fetches required to render the next view.
 
 ```mermaid
 sequenceDiagram
