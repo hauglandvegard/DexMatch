@@ -3,15 +3,15 @@ A dating app for Pokémon to find their true mate.
 
 ## Overview
 
-1.  [Building](#building)
-    1.  [Prerequisites](#prerequisites)
-    2.  [How to Run the App](#how-to-run-the-app)
+1. [Building](#building)
+    1. [Prerequisites](#prerequisites)
+    2. [How to Run the App](#how-to-run-the-app)
 
-2.  [Architechture](#architecture)
-    1.  [The stack](#the-stack)
-    2.  [Use Case Diagram](#use-case-diagram)
-    3.  [Entity-Relationship Diagram](#entity-relationship-diagram)
-    4.  [Sequence Diagram](#sequence-diagram)
+2. [Architecture](#architecture)
+    1. [The stack](#the-stack)
+    2. [System Context Diagram](#system-context-diagram)
+    3. [Entity-Relationship Diagram](#entity-relationship-diagram)
+    4. [Sequence Diagram](#sequence-diagram)
 
 ## Building
 
@@ -19,12 +19,23 @@ A dating app for Pokémon to find their true mate.
 * Node.js (v18 or higher)
 * NPM (Node Package Manager)
 
-### How to Run the App
+### How to Run the App (Local Development)
 1. Clone this repository to your local machine.
 2. Open your terminal and navigate to the project folder: `cd dexmatch`
 3. Install the dependencies: `npm install`
-4. Start the server: `npm start`
-5. Open your web browser and go to: `http://localhost:3000`
+
+**To run in Development Mode (Recommended for testing):**
+This mode uses `ts-node` and `nodemon` to automatically restart the server when files change.
+1. Run: `npm run dev`
+2. Open your web browser and go to: `http://localhost:3000`
+
+**To run in Production Mode:**
+This mode compiles the TypeScript code into optimized JavaScript before running.
+1. Compile the code: `npm run build`
+2. Start the server: `npm start`
+3. Open your web browser and go to: `http://localhost:3000`
+
+*Note: The database uses SQLite. You do not need to install or configure any external database servers. A local database file will be created automatically upon launch.*
 
 ## Architecture
 
@@ -151,5 +162,3 @@ sequenceDiagram
     S->>S: Render swipe.ejs with all data
     S-->>U: Return HTML View
 ```
-
----
