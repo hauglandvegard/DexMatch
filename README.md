@@ -6,12 +6,14 @@ A dating app for Pokémon to find their true mate.
 1. [Building](#building)
     1. [Prerequisites](#prerequisites)
     2. [How to Run the App](#how-to-run-the-app)
+    3. [Running Tests](#running-tests)
 
 2. [Architecture](#architecture)
     1. [The stack](#the-stack)
     2. [System Context Diagram](#system-context-diagram)
     3. [Entity-Relationship Diagram](#entity-relationship-diagram)
     4. [Sequence Diagram](#sequence-diagram)
+    5. [Testing Strategy](#testing-strategy)
 
 ## Building
 
@@ -28,7 +30,7 @@ A dating app for Pokémon to find their true mate.
 
 <br>
 
-#### Development Mode (Recommended for testing):
+#### Development Mode:
 This mode uses `ts-node` and `nodemon` to automatically restart the server when files change.
 1. Run: `npm run dev`
 2. Open your web browser and go to: `http://localhost:3000`
@@ -43,6 +45,16 @@ This mode compiles the TypeScript code into optimized JavaScript before running.
 
 *Note: The database uses SQLite. You do not need to install or configure any external database servers. A local database file will be created automatically upon launch.*
 
+<br>
+
+### Running Tests
+The project uses **Jest** and **Supertest** to perform integration testing. These tests verify that the server boots correctly, routes are accessible, and the EJS engine renders the expected content.
+
+1. Ensure dependencies are installed: `npm install`
+2. Run the test suite: `npm test`
+
+*Note: The tests use a decoupled version of the Express app, allowing them to run without interfering with a live server instance.*
+
 ## Architecture
 
 ### The stack
@@ -52,6 +64,7 @@ This application is built using a Server-Side Rendered (SSR) architecture follow
 * **[Node.js](https://nodejs.org/) & [Express.js](https://expressjs.com/):** The core web framework used to handle routing, HTTP requests, and server logic.
 * **[Axios](https://axios-http.com/):** A promise-based HTTP client used in the service layer to fetch and parse external API data cleanly.
 * **[Faker.js](https://fakerjs.dev/):** Used to generate random, localized human names for the Pokémon to enhance the "Tinder" theme.
+* **[Jest](https://jestjs.io/) & [Supertest](https://github.com/ladjs/supertest):** Testing framework and library used for integration testing to ensure routes and server logic remain reliable.
 
 **Frontend / Views**
 * **[EJS (Embedded JavaScript)](https://ejs.co/):** The templating engine used to inject dynamic server data (Pokémon stats, jokes, user preferences) directly into HTML layouts before sending them to the client.
@@ -168,3 +181,9 @@ sequenceDiagram
     S->>S: Render swipe.ejs with all data
     S-->>U: Return HTML View
 ```
+
+### Testing Strategy
+To ensure the application is reliable and maintainable, I implemented an integration testing suite:
+
+* **Decoupled Architecture:** The Express application logic is separated into `src/app.ts`, while the server listener resides in `src/server.ts`. This allows the testing suite to execute the app in-memory without binding to a network port.
+* **Route Verification:** Tests simulate real HTTP requests to verify that critical paths (like Login and Swipe) return the correct status codes and UI elements.
