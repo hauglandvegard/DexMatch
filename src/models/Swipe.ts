@@ -1,0 +1,3 @@
+/*
+    Logic regarding each swipe that is made
+*/
