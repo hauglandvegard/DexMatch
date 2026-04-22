@@ -88,6 +88,9 @@ flowchart LR
           string name
           string image_url
           string area_id
+          int weight
+          int height
+          int level
       }
       
       SWIPES {
