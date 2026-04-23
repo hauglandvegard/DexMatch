@@ -26,11 +26,18 @@ const initDB = () => {
         );
 
         CREATE TABLE IF NOT EXISTS POKEMONS (
-            id INTEGER PRIMARY KEY AUTOINCREMENT
-            pokemon_id INTEGER NOT NULL
-            name TEXT NOT NULL
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            pokemon_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
             image_url TEXT,
-            area_id TEXT
+            area_id TEXT,
+            gender BOOLEAN,
+            weight INTEGER,
+            height INTEGER,
+            level INTEGER,
+            nature_id INTEGER,
+            iv_value INTEGER,
+            ev_value INTEGER
         );
 
         CREATE TABLE IF NOT EXISTS SWIPES (
