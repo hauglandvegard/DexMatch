@@ -140,18 +140,23 @@ erDiagram
         boolean is_wanted
     }
     
-    POKEMONS {
+    POKEMON {
         int id PK          
         int pokemon_id
         string name
         string area_id
-        boolean gender
+        string gender
         int weight
         int height
         int level
         int nature_id
-        int iv_value
-        int ev_value
+        int hp_iv
+        int atk_iv
+        int def_iv
+        int sp_atk_iv
+        int sp_def_iv
+        int speed_iv
+        boolean is_shiny
     }
     
     SWIPES {
