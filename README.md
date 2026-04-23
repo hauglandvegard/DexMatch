@@ -142,11 +142,14 @@ erDiagram
         int id PK          
         int pokemon_id
         string name
-        string image_url
         string area_id
+        boolean gender
         int weight
         int height
         int level
+        int nature_id
+        int iv_value
+        int ev_value
     }
     
     SWIPES {
@@ -202,7 +205,9 @@ Given more time, here are the features and technical enhancements I would priori
 * **Advanced Filtering:** Allow users to filter Pokémon by specific generations, weight classes, or base stats (expanding beyond just region and type).
 * **Smart Matching Engine:** Optimize the generation logic by storing previously surfaced Pokémon in the database. Subsequent users would then experience a weighted chance of encountering an existing, database-cached Pokémon versus generating a completely new one.
 * **Multi-Language Support (i18n):** Add localization options allowing users to change the language of the application interface.
-
+* **404-Page:** There is currently no 404-end point for the user.
+* **A Chat:** There should be a chat where the user can "chat" with a Pokémon and get multiple choice questions. Given the nature and type of the pokémon, the answer should change if the pokémon finds you more or less favorable.
+ 
 ### Architecture & Performance
 * **Caching Layer:** Introduce an in-memory cache (or Redis) for PokéAPI and Chuck Norris API responses to reduce network latency and prevent rate-limiting on popular queries.
 * **Robust Authentication:** Replace the current session management with JWT (JSON Web Tokens) to make the authentication more stateless and scalable.
