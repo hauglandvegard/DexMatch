@@ -1,7 +1,7 @@
-const Database = require('better-sqlite3');
-const path = require('path');
+import path from 'path';
+import Database from 'better-sqlite3';
 
-const dbPath = path.join(__dirname, 'database.sqlite');
+const dbPath = path.join(import.meta.dirname, 'database.sqlite');
 const db = new Database(dbPath, { verbose: console.log });
 
 db.pragma('foreign_keys = ON');
@@ -55,4 +55,4 @@ const initDB = () => {
 
 initDB();
 
-module.exports = db;
+export default db;
