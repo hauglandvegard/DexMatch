@@ -136,26 +136,26 @@ erDiagram
     USER_TYPE_PREFS {
         int id PK
         int user_id FK
-        string type
+        int type_id
         boolean is_wanted
     }
     
     POKEMON {
         int id PK          
-        int pokemon_id
+        int species_id
         string name
-        string area_id
+        int area_id
         string gender
         int weight
         int height
         int level
         int nature_id
-        int hp
-        int atk
-        int def
-        int sp_atk
-        int sp_def
-        int speed
+        int iv_hp
+        int iv_atk
+        int iv_def
+        int iv_sp_atk
+        int iv_sp_def
+        int iv_speed
         boolean is_shiny
     }
     
@@ -168,7 +168,7 @@ erDiagram
     
     USERS ||--o{ USER_TYPE_PREFS: has
     USERS ||--o{ SWIPES: makes
-    POKEMONS ||--o{ SWIPES: exists
+    POKEMON ||--o{ SWIPES: exists
 ```
 
 ### Sequence Diagram
