@@ -15,6 +15,8 @@ A dating app for Pokémon to find their true mate.
     4. [Sequence Diagram](#sequence-diagram)
     5. [Testing Strategy](#testing-strategy)
 
+3. [Future Improvements](#future-improvements)
+
 ## Building
 
 ### Prerequisites
@@ -187,3 +189,20 @@ To ensure the application is reliable and maintainable, I implemented an integra
 
 * **Decoupled Architecture:** The Express application logic is separated into `src/app.ts`, while the server listener resides in `src/server.ts`. This allows the testing suite to execute the app in-memory without binding to a network port.
 * **Route Verification:** Tests simulate real HTTP requests to verify that critical paths (like Login and Swipe) return the correct status codes and UI elements.
+
+## Future Improvements
+Given more time, here are the features and technical enhancements I would prioritize to take this application to the next level:
+
+### User Experience & UI Polish
+* **UI Animations:** Implement swipe-left/swipe-right card animations to mimic the native Tinder experience.
+* **Actual Pokémon Cards:** Make the match cards look and feel like physical Pokémon trading cards. This would include a highly visual front side and a flippable back side containing their stats.
+* **Sound On Encounter:** Enhance the immersion by playing the specific Pokémon's in-game audio cry as their card is uncovered.
+
+### Core Features & Functionality
+* **Advanced Filtering:** Allow users to filter Pokémon by specific generations, weight classes, or base stats (expanding beyond just region and type).
+* **Smart Matching Engine:** Optimize the generation logic by storing previously surfaced Pokémon in the database. Subsequent users would then experience a weighted chance of encountering an existing, database-cached Pokémon versus generating a completely new one.
+* **Multi-Language Support (i18n):** Add localization options allowing users to change the language of the application interface.
+
+### Architecture & Performance
+* **Caching Layer:** Introduce an in-memory cache (or Redis) for PokéAPI and Chuck Norris API responses to reduce network latency and prevent rate-limiting on popular queries.
+* **Robust Authentication:** Replace the current session management with JWT (JSON Web Tokens) to make the authentication more stateless and scalable.
