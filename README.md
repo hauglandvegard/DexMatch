@@ -67,6 +67,7 @@ This application is built using a Server-Side Rendered (SSR) architecture follow
 * **[Axios](https://axios-http.com/):** A promise-based HTTP client used in the service layer to fetch and parse external API data cleanly.
 * **[Faker.js](https://fakerjs.dev/):** Used to generate random, localized human names for the Pokémon to enhance the "Tinder" theme.
 * **[Jest](https://jestjs.io/) & [Supertest](https://github.com/ladjs/supertest):** Testing framework and library used for integration testing to ensure routes and server logic remain reliable.
+* **[Winston](https://github.com/winstonjs/winston) & [Morgan](https://github.com/expressjs/morgan):** Used together to provide centralized, environment-aware application logging and HTTP request tracing.
 
 **Frontend / Views**
 * **[EJS (Embedded JavaScript)](https://ejs.co/):** The templating engine used to inject dynamic server data (Pokémon stats, jokes, user preferences) directly into HTML layouts before sending them to the client.
@@ -187,11 +188,13 @@ sequenceDiagram
     S-->>U: Return HTML View
 ```
 
-### Testing Strategy
-To ensure the application is reliable and maintainable, I implemented an integration testing suite:
+### Testing & CI/CD Strategy
+To ensure the application is reliable and maintainable, I implemented an integration testing suite and an automated deployment pipeline:
 
 * **Decoupled Architecture:** The Express application logic is separated into `src/app.ts`, while the server listener resides in `src/server.ts`. This allows the testing suite to execute the app in-memory without binding to a network port.
 * **Route Verification:** Tests simulate real HTTP requests to verify that critical paths (like Login and Swipe) return the correct status codes and UI elements.
+* **Continuous Integration (GitHub Actions):** Pushing code to any branch triggers a remote CI workflow that automatically installs dependencies and runs the Jest test suite. 
+* **Continuous Deployment:** If code is pushed specifically to the `main` branch, the workflow will first run the tests. Only if the tests pass will it securely SSH into the production server and execute the deployment script.
 
 ## Future Improvements
 Given more time, here are the features and technical enhancements I would prioritize to take this application to the next level:
