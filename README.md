@@ -204,13 +204,15 @@ Given more time, here are the features and technical enhancements I would priori
 * **Actual Pokémon Cards:** Make the match cards look and feel like physical Pokémon trading cards. This would include a highly visual front side and a flippable back side containing their stats.
 * **Sound On Encounter:** Enhance the immersion by playing the specific Pokémon's in-game audio cry as their card is uncovered.
 * **Legecy Feature:** Allow the user to toggle a legecy variable that returns the classic sprite and sound from a pokémon.
+* **Metric or Imperial** Allow user to toggle between displaying metric units of imperial.
 
 ### Core Features & Functionality
 * **Advanced Filtering:** Allow users to filter Pokémon by specific generations, weight classes, or base stats (expanding beyond just region and type).
 * **Smart Matching Engine:** Optimize the generation logic by storing previously surfaced Pokémon in the database. Subsequent users would then experience a weighted chance of encountering an existing, database-cached Pokémon versus generating a completely new one.
 * **Multi-Language Support (i18n):** Add localization options allowing users to change the language of the application interface.
 * **404-Page:** There is currently no 404-end point for the user.
-* **A Chat:** There should be a chat where the user can "chat" with a Pokémon and get multiple choice questions. Given the nature and type of the pokémon, the answer should change if the pokémon finds you more or less favorable.
+* **Chat level 1:** There should be a chat where the user can "chat" with a Pokémon and get multiple choice questions. Given the nature and type of the pokémon, the answer should change if the pokémon finds you more or less favorable.
+* **Chat level 2:** Improve the chat partner to have an AI persona based on the stats of the given pokémon.
  
 ### Architecture & Performance
 * **Caching Layer:** Introduce an in-memory cache (or Redis) for PokéAPI and Chuck Norris API responses to reduce network latency and prevent rate-limiting on popular queries.
