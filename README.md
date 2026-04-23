@@ -216,5 +216,5 @@ Given more time, here are the features and technical enhancements I would priori
 * **Chat level 2:** Improve the chat partner to have an AI persona based on the stats of the given pokémon.
  
 ### Architecture & Performance
-* **Caching Layer:** Introduce an in-memory cache (or Redis) for PokéAPI and Chuck Norris API responses to reduce network latency and prevent rate-limiting on popular queries.
+* **Distributed Caching Layer:** While the application currently leverages in-memory RAM caching for PokéAPI via its official SDK, introducing Redis would allow for persistent, distributed caching of both the Chuck Norris API responses and user sessions, making the app fully stateless and scalable across multiple server instances.
 * **Robust Authentication:** Replace the current session management with JWT (JSON Web Tokens) to make the authentication more stateless and scalable.
