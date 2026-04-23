@@ -2,6 +2,8 @@ import express from 'express';
 import session from 'express-session';
 import path from 'path';
 import expressLayouts from 'express-ejs-layouts';
+import morgan from 'morgan';
+import logger from './utils/logger';
 
 const app = express();
 
@@ -9,6 +11,10 @@ app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
 app.set('layout', 'layout');
+
+app.use(morgan('dev', {
+    stream: { write: (message: string) => logger.info(message.trim()) }
+}));
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
