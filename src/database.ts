@@ -35,12 +35,12 @@ const initDB = () => {
             height INTEGER,
             level INTEGER,
             nature_id INTEGER,
-            hp_iv INTEGER,
-            atk_iv INTEGER,
-            def_iv INTEGER,
-            sp_atk_iv INTEGER,
-            sp_def_iv INTEGER,
-            speed_iv INTEGER,
+            hp INTEGER,
+            atk INTEGER,
+            def INTEGER,
+            sp_atk INTEGER,
+            sp_def INTEGER,
+            speed INTEGER,
             is_shiny BOOLEAN
         );
 

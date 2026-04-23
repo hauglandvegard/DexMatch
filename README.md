@@ -150,12 +150,12 @@ erDiagram
         int height
         int level
         int nature_id
-        int hp_iv
-        int atk_iv
-        int def_iv
-        int sp_atk_iv
-        int sp_def_iv
-        int speed_iv
+        int hp
+        int atk
+        int def
+        int sp_atk
+        int sp_def
+        int speed
         boolean is_shiny
     }
     
