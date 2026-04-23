@@ -64,7 +64,8 @@ This application is built using a Server-Side Rendered (SSR) architecture follow
 
 **Core Backend**
 * **[Node.js](https://nodejs.org/) & [Express.js](https://expressjs.com/):** The core web framework used to handle routing, HTTP requests, and server logic.
-* **[Axios](https://axios-http.com/):** A promise-based HTTP client used in the service layer to fetch and parse external API data cleanly.
+* **[Pokedex-Promise-v2](https://github.com/PokeAPI/pokedex-promise-v2):** The official Node.js SDK for PokéAPI. This wrapper abstracts away complex network requests and provides a built-in, customizable RAM caching layer to significantly reduce network latency and prevent rate-limiting.
+* **[Axios](https://axios-http.com/):** A promise-based HTTP client used in the service layer specifically to fetch and parse external data from the Chuck Norris API.
 * **[Faker.js](https://fakerjs.dev/):** Used to generate random, localized human names for the Pokémon to enhance the "Tinder" theme.
 * **[Jest](https://jestjs.io/) & [Supertest](https://github.com/ladjs/supertest):** Testing framework and library used for integration testing to ensure routes and server logic remain reliable.
 * **[Winston](https://github.com/winstonjs/winston) & [Morgan](https://github.com/expressjs/morgan):** Used together to provide centralized, environment-aware application logging and HTTP request tracing.

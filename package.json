@@ -33,6 +33,7 @@
     "express-ejs-layouts": "^2.5.1",
     "express-session": "^1.19.0",
     "morgan": "^1.10.1",
+    "pokedex-promise-v2": "^4.2.1",
     "winston": "^3.19.0"
   },
   "devDependencies": {
