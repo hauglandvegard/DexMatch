@@ -1,8 +1,10 @@
+import path from 'path';
+
 import express from 'express';
 import session from 'express-session';
-import path from 'path';
 import expressLayouts from 'express-ejs-layouts';
 import morgan from 'morgan';
+
 import logger from './utils/logger';
 
 const app = express();

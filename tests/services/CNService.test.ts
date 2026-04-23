@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 import { getJokeForType } from '../../src/services/CNService';
 import logger from '../../src/utils/logger';
 

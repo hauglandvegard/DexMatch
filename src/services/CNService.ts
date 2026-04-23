@@ -4,9 +4,9 @@
     Fetch tailored joke from https://api.chucknorris.io/jokes/search?query={query}
     or a random joke from https://api.chucknorris.io/jokes/random
 */
+import axios from 'axios';
 
 import logger from '../utils/logger';
-import axios from 'axios';
 
 const CHUCK_API_BASE = 'https://api.chucknorris.io/jokes';
 
