@@ -25,4 +25,12 @@ app.get('/', (req, res) => {
     res.render('login');
 });
 
+app.get('/test', (req: Request, res: Response) => {
+    // We pass an object as the second argument to send data to the page
+    res.render('test', {
+        pageTitle: "Testing Page",
+        message: "This is a dynamic message from the server!"
+    });
+});
+
 export { app };
