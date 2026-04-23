@@ -203,6 +203,7 @@ Given more time, here are the features and technical enhancements I would priori
 * **UI Animations:** Implement swipe-left/swipe-right card animations to mimic the native Tinder experience.
 * **Actual Pokémon Cards:** Make the match cards look and feel like physical Pokémon trading cards. This would include a highly visual front side and a flippable back side containing their stats.
 * **Sound On Encounter:** Enhance the immersion by playing the specific Pokémon's in-game audio cry as their card is uncovered.
+* **Legecy Feature:** Allow the user to toggle a legecy variable that returns the classic sprite and sound from a pokémon.
 
 ### Core Features & Functionality
 * **Advanced Filtering:** Allow users to filter Pokémon by specific generations, weight classes, or base stats (expanding beyond just region and type).
