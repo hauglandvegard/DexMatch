@@ -34,3 +34,9 @@ export interface Pokemon {
     statsIV: PokeStats;
     isShiny: boolean;
 }
+
+export enum Gender {
+    GENDERLESS = 0,
+    MALE = 1,
+    FEMALE = 2
+}
