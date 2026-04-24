@@ -4,24 +4,23 @@
     Fetch tailored joke from https://api.chucknorris.io/jokes/search?query={query}
     or a random joke from https://api.chucknorris.io/jokes/random
 */
-import axios from 'axios';
+import axios from "axios";
 
-import logger from '../utils/logger';
+import logger from "../utils/logger";
 
-const CHUCK_API_BASE = 'https://api.chucknorris.io/jokes';
+const CHUCK_API_BASE = "https://api.chucknorris.io/jokes";
 
 /**
  * Fetches a pseudorandom Chuck Norris joke from https://api.chucknorris.io/jokes.
  * * @param pokemonType - The pokemon type that the joke should be tailored to.
  * @returns The Chuck Norris joke.
  */
-export const getJokeForType = async (pokemonType: string): Promise<string> => {
+export async function getJokeForType(pokemonType: string): Promise<string> {
     try {
-
         // REQUIRMENT: The joke should be connected to the pokemons type.
         const searchUrl = `${CHUCK_API_BASE}/search?query=${pokemonType}`;
 
-        logger.debug(`Fetching Chuck Norris joke from ${searchUrl}`)
+        logger.debug(`Fetching Chuck Norris joke from ${searchUrl}`);
 
         const searchResponse = await axios.get(searchUrl);
 
@@ -36,13 +35,15 @@ export const getJokeForType = async (pokemonType: string): Promise<string> => {
         // REQUIREMENT: If there is no joke for the given type fall back to random.
         const randomUrl = `${CHUCK_API_BASE}/random`;
 
-        logger.debug(`Fetching failed. Norris joke from ${searchUrl}`)
+        logger.debug(`Fetching failed. Norris joke from ${searchUrl}`);
 
         const randomResponse = await axios.get(randomUrl);
         return randomResponse.data.value;
-
     } catch (error) {
-        logger.error(`Failed to fetch Chuck Norris joke for type ${pokemonType}:`, error);
+        logger.error(
+            `Failed to fetch Chuck Norris joke for type ${pokemonType}:`,
+            error,
+        );
         return "Chuck Norris caught all 1000+ Pokémon using only a single regular Pokéball.";
     }
 }
