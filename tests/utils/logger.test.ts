@@ -1,4 +1,3 @@
-// tests/utils/logger.test.ts
 import logger from '../../src/utils/logger';
 
 describe('Logger Utility', () => {
