@@ -12,7 +12,7 @@ function mapPokemon(row: PokemonRow): Pokemon {
         name: row.name,
         locationId: row.location_id ?? 0,
         gender: row.gender ?? 0,
-        description: "",
+        description: row.description,
         level: row.level,
         size: {
             weight: row.weight,
@@ -34,10 +34,10 @@ function mapPokemon(row: PokemonRow): Pokemon {
 // Prepared statements for production performance
 const insertStmt = db.prepare(`
     INSERT INTO POKEMON (
-        species_id, name, location_id, gender,
+        species_id, name, description, location_id, gender,
         weight, height, level, nature_id,
         iv_hp, iv_atk, iv_def, iv_sp_atk, iv_sp_def, iv_speed, is_shiny
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `);
 
 const selectByIdStmt = db.prepare("SELECT * FROM POKEMON WHERE id = ?");
@@ -51,6 +51,7 @@ export function insertPokemon(draftPokemon: DraftPokemon): Pokemon {
     const info = insertStmt.run(
         draftPokemon.speciesId,
         draftPokemon.name,
+        draftPokemon.description,
         draftPokemon.locationId,
         draftPokemon.gender,
         draftPokemon.size.weight,
