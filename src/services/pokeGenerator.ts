@@ -36,9 +36,10 @@ import {
 import logger from "../utils/logger";
 
 /**
- * Gives each pokémon a bit more uniqueness by randomizing their size.
- * * @param attr - The pokémon's attributes to be modified
- * @returns A modified version of the attributes
+ * Randomly scales a Pokémon's height and weight based on a shared genetic bell curve.
+ * Height features an additional random "wobble" so it doesn't scale perfectly 1:1 with weight.
+ * * @param {PokeAttributes} attr - The base attributes object containing initial height and weight.
+ * @returns {PokeAttributes} The mutated attributes object with randomized size values.
  */
 function randomizeSize(attr: PokeAttributes): PokeAttributes {
     const sizeGene = getBellCurveRandom();
@@ -69,7 +70,8 @@ function randomizeSize(attr: PokeAttributes): PokeAttributes {
 /**
  * Genaretes individual values for a pokémon that determines it´s individual stats according to
  * Genartion III logic (https://bulbapedia.bulbagarden.net/wiki/Individual_values).
- * @returns A PokemonIndividualValues object.
+ * * @param {boolean} isLegendary - If true, guarantees three randomly selected stats will have a perfect 31 IV.
+ * @returns {PokeStats} An object containing the generated IVs (0-31) mapped to each core stat.
  */
 function generatePokemonIVs(isLegendary: boolean): PokeStats {
     const ivs = [];
@@ -105,6 +107,12 @@ function generatePokemonIVs(isLegendary: boolean): PokeStats {
     return statIVs;
 }
 
+/**
+ * Generates a random Pokémon level between `minLevel` and 100.
+ * Uses a folded bell curve to heavily weight the result closer to `minLevel`.
+ * * @param {number} minLevel - The lowest possible level to generate.
+ * @returns {number} The generated level, strictly bounded up to 100.
+ */
 function generateLevel(minLevel: number): number {
     const maxLevel = 100;
 
@@ -127,7 +135,20 @@ function generateLevel(minLevel: number): number {
     return level;
 }
 
-export function generatePokemon(speciesData: CleanSpeciesData): Pokemon {
+/**
+ * Determines if a Pokémon is shiny based on a classic 1/4096 probability.
+ * * @returns {boolean} `true` if the Pokémon is shiny, `false` otherwise.
+ */
+function isShiny(): boolean {
+    const shinyRate = 4096;
+    const roll = Math.floor(Math.random() * shinyRate);
+
+    return roll === 151;
+}
+
+export default function generatePokemon(
+    speciesData: CleanSpeciesData,
+): Pokemon {
     const attr = randomizeSize(speciesData.attributs);
 
     const pokemon: Pokemon = {
