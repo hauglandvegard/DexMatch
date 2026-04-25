@@ -19,7 +19,7 @@ export interface CleanSpeciesData {
     attributs: PokeAttributes;
     stats: PokeStats;
     isLegendary: boolean;
-    evolvedLevel: number;
+    minEvolvedLevel: number;
     chanseForMale: number;
     LocationIds: number[];
 }
@@ -38,5 +38,5 @@ export interface Pokemon {
 export enum Gender {
     GENDERLESS = 0,
     MALE = 1,
-    FEMALE = 2
+    FEMALE = 2,
 }
