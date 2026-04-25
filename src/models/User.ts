@@ -16,7 +16,6 @@ function mapUser(row: UserRow): User {
     };
 }
 
-// Prepared statements for production performance
 const insertUserStmt = db.prepare(
     "INSERT INTO USERS (username, password_hash) VALUES (?, ?)",
 );
