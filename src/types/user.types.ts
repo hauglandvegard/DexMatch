@@ -1,11 +1,8 @@
-export interface DraftUser {
+export interface User {
+    id: number;
     username: string;
     displayName: string | null;
     passwordHash: string;
     regionIdPref: number | null;
     themeId: number;
-}
-
-export interface User extends DraftUser {
-    id: number;
 }
