@@ -27,7 +27,7 @@ import { getBellCurveRandom } from "../utils/mathUtils";
 import { getRandomIndices } from "../utils/arrayUtils";
 import {
     Pokemon,
-    PokeAttributes,
+    PokeSize,
     PokeStats,
     CleanSpeciesData,
 } from "../types/pokemon.types";
@@ -39,7 +39,7 @@ import logger from "../utils/logger";
  * * @param {PokeAttributes} attr - The base attributes object containing initial height and weight.
  * @returns {PokeAttributes} The mutated attributes object with randomized size values.
  */
-function randomizeSize(attr: PokeAttributes): PokeAttributes {
+function randomizeSize(attr: PokeSize): PokeSize {
     const sizeGene = getBellCurveRandom();
 
     // Weight variance: 0.6x to 1.4x
@@ -71,7 +71,7 @@ function randomizeSize(attr: PokeAttributes): PokeAttributes {
  * * @param {boolean} isLegendary - If true, guarantees three randomly selected stats will have a perfect 31 IV.
  * @returns {PokeStats} An object containing the generated IVs (0-31) mapped to each core stat.
  */
-function generatePokemonIVs(isLegendary: boolean): PokeStats {
+function generateIVs(isLegendary: boolean): PokeStats {
     const ivs = [];
 
     // If the pokemon is legendary, 3 of the 6 values are automatically 31
@@ -155,16 +155,17 @@ export default function generatePokemon(
     speciesData: CleanSpeciesData,
     chuckNorrisJoke: string,
 ): Pokemon {
-    const attr = randomizeSize(speciesData.attributs);
+    const size = randomizeSize(speciesData.size);
 
     const pokemon: Pokemon = {
         id: 0, // TODO: Set up call to database to get a unique id
         name: faker.person.firstName(), // REQUIREMENT: Each pokémon should have a random human name. I.e. Josh the Charmander
         speciesId: speciesData.id,
+        nature_id: 0, // TODO: Implement randomizer
         description: chuckNorrisJoke, // REQUIREMENT: Each pokemon will have a Chuck Norris joke as a description.
         level: generateLevel(speciesData.minEvolvedLevel),
-        attributes: attr, // REQUIREMENT: Each pokémon should have basic information (e.g. type, weight, skill, height, lvl).
-        statsIV: generatePokemonIVs(speciesData.isLegendary),
+        size: size, // REQUIREMENT: Each pokémon should have basic information (e.g. type, weight, skill, height, lvl).
+        statsIV: generateIVs(speciesData.isLegendary),
         isShiny: isShiny(),
     };
 

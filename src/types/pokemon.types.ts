@@ -6,22 +6,9 @@ export interface PokeStats {
     spDef: number;
     speed: number;
 }
-export interface PokeAttributes {
+export interface PokeSize {
     height: number;
     weight: number;
-    nature_id: number;
-    isLegendary: boolean;
-}
-
-export interface CleanSpeciesData {
-    id: number;
-    name: string;
-    attributs: PokeAttributes;
-    stats: PokeStats;
-    isLegendary: boolean;
-    minEvolvedLevel: number;
-    chanseForMale: number;
-    LocationIds: number[];
 }
 
 export interface Pokemon {
@@ -30,9 +17,22 @@ export interface Pokemon {
     speciesId: number;
     description: string;
     level: number;
-    attributes: PokeAttributes;
+    size: PokeSize;
     statsIV: PokeStats;
     isShiny: boolean;
+    nature_id: number;
+}
+
+export interface CleanSpeciesData {
+    id: number;
+    name: string;
+    size: PokeSize;
+    stats: PokeStats;
+    types: string[];
+    isLegendary: boolean;
+    minEvolvedLevel: number;
+    chanseForMale: number;
+    LocationIds: number[];
 }
 
 export enum Gender {
