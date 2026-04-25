@@ -17,7 +17,6 @@ if (dbPath !== ":memory:") {
 
 const db = new Database(dbPath);
 
-// Production best practices for SQLite
 db.pragma("foreign_keys = ON");
 db.pragma("journal_mode = WAL");
 db.pragma("synchronous = NORMAL");
@@ -46,6 +45,7 @@ export const initDB = () => {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             species_id INTEGER NOT NULL,
             name TEXT NOT NULL,
+            description TEXT NOT NULL DEFAULT '',
             location_id INTEGER,
             gender INTEGER,
             weight INTEGER,
@@ -74,6 +74,9 @@ export const initDB = () => {
     `);
     logger.info("Database initialized successfully!");
 };
+
+// Run at import time so tables exist before any model calls db.prepare()
+initDB();
 
 // Graceful shutdown
 process.on("exit", () => db.close());
