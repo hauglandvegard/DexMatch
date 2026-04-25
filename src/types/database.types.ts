@@ -11,6 +11,7 @@ export interface PokemonRow {
     id: number;
     species_id: number;
     name: string;
+    description: string;
     location_id: number | null;
     gender: number | null;
     weight: number;
