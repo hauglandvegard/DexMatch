@@ -6,14 +6,13 @@ import {
     updateUserThemePreference,
     setUserTypePreference,
 } from "../../src/models/User";
-import db, { initDB } from "../../src/database";
+import db from "../../src/database";
 
 describe("User Model Tests", () => {
     let testUserId: number;
     let testUsername: string;
 
     beforeAll(() => {
-        initDB();
         testUsername = `testuser_${Date.now()}`;
     });
 
