@@ -78,10 +78,7 @@ export function fetchEvolutionData(url: string) {
 }
 
 export function fetchRegionList() {
-    return safeFetch(
-        () => P.getRegionsList(),
-        `Failed to fetch region list`,
-    );
+    return safeFetch(() => P.getRegionsList(), `Failed to fetch region list`);
 }
 
 export function fetchRegionById(regionId: number) {
@@ -89,4 +86,52 @@ export function fetchRegionById(regionId: number) {
         () => P.getRegionByName(regionId),
         `Failed to fetch region ${regionId}`,
     );
+}
+
+const STAT_KEY_MAP: Record<string, keyof PokeStats> = {
+    hp: "hp",
+    attack: "atk",
+    defense: "def",
+    "special-attack": "spAtk",
+    "special-defense": "spDef",
+    speed: "speed",
+};
+
+export async function buildCleanSpeciesData(
+    speciesId: number,
+): Promise<CleanSpeciesData | null> {
+    const [pokemonData, speciesData] = await Promise.all([
+        fetchPokemonById(speciesId),
+        fetchSpeciesById(speciesId),
+    ]);
+
+    if (!pokemonData || !speciesData) return null;
+
+    const pd = pokemonData as any;
+    const sd = speciesData as any;
+
+    const baseStats: PokeStats = {
+        hp: 0,
+        atk: 0,
+        def: 0,
+        spAtk: 0,
+        spDef: 0,
+        speed: 0,
+    };
+    for (const s of pd.stats) {
+        const key = STAT_KEY_MAP[s.stat.name];
+        if (key) baseStats[key] = s.base_stat;
+    }
+
+    return {
+        id: sd.id,
+        name: pd.name,
+        baseStats,
+        baseSize: { height: pd.height, weight: pd.weight },
+        types: pd.types.map((t: any) => t.type.name as string),
+        isLegendary: sd.is_legendary,
+        minEvolvedLevel: sd.evolves_from_species ? 20 : 1,
+        chanceForMale: 0.5,
+        locationIds: [],
+    };
 }
