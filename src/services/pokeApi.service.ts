@@ -1,7 +1,7 @@
 /*
     The connection point between the PokéAPI and the application.
 
-    Interresting data:
+    Interesting data:
 
         Species
         - base_happiness -> int
@@ -36,6 +36,7 @@
 
 import Pokedex from "pokedex-promise-v2";
 
+import { PokeStats, CleanSpeciesData } from "../types/pokemon.types";
 import logger from "../utils/logger";
 
 const P = new Pokedex({
@@ -43,12 +44,6 @@ const P = new Pokedex({
     timeout: 5 * 1000,
 });
 
-/**
- * A generic helper to execute Pokedex API calls safely.
- * @param fetcher A function returning the Pokedex promise.
- * @param errorMessage The message to log if it fails.
- * @returns The data, or null if the request fails.
- */
 async function safeFetch<T>(
     fetcher: () => Promise<T>,
     errorMessage: string,
@@ -61,14 +56,14 @@ async function safeFetch<T>(
     }
 }
 
-export function fetchPokemonData(pokeId: number) {
+export function fetchPokemonById(pokeId: number) {
     return safeFetch(
         () => P.getPokemonByName(pokeId),
         `Failed to fetch pokemon data for ${pokeId}`,
     );
 }
 
-export function fetchSpeciesData(pokeId: number) {
+export function fetchSpeciesById(pokeId: number) {
     return safeFetch(
         () => P.getPokemonSpeciesByName(pokeId),
         `Failed to fetch species data for ${pokeId}`,
@@ -85,6 +80,13 @@ export function fetchEvolutionData(url: string) {
 export function fetchRegionList() {
     return safeFetch(
         () => P.getRegionsList(),
-        `Failed to fetch the list of regions`,
+        `Failed to fetch region list`,
+    );
+}
+
+export function fetchRegionById(regionId: number) {
+    return safeFetch(
+        () => P.getRegionByName(regionId),
+        `Failed to fetch region ${regionId}`,
     );
 }
