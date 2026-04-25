@@ -1,5 +1,6 @@
 import db from "../database";
-import { User, UserRow } from "../types/database.types";
+import { UserRow } from "../types/database.types";
+import { User } from "../types/user.types";
 
 /**
  * Maps database row to User interface.
@@ -15,6 +16,32 @@ function mapUser(row: UserRow): User {
     };
 }
 
+// Prepared statements for production performance
+const insertUserStmt = db.prepare(
+    "INSERT INTO USERS (username, password_hash) VALUES (?, ?)",
+);
+
+const selectByUsernameStmt = db.prepare(
+    "SELECT * FROM USERS WHERE username = ?",
+);
+
+const selectByIdStmt = db.prepare("SELECT * FROM USERS WHERE id = ?");
+
+const updateRegionStmt = db.prepare(
+    "UPDATE USERS SET region_id_pref = ? WHERE id = ?",
+);
+
+const updateThemeStmt = db.prepare(
+    "UPDATE USERS SET theme_id = ? WHERE id = ?",
+);
+
+const upsertTypePrefStmt = db.prepare(`
+    INSERT INTO USER_TYPE_PREFS (user_id, type_id, is_wanted)
+    VALUES (?, ?, ?)
+    ON CONFLICT(user_id, type_id) DO UPDATE SET
+        is_wanted = excluded.is_wanted
+`);
+
 /**
  * Creates new user in DB.
  * @param username - Chosen username.
@@ -24,10 +51,7 @@ function mapUser(row: UserRow): User {
  */
 export function createUser(username: string, passwordHash: string): number {
     try {
-        const stmt = db.prepare(
-            "INSERT INTO USERS (username, password_hash) VALUES (?, ?)",
-        );
-        const info = stmt.run(username, passwordHash);
+        const info = insertUserStmt.run(username, passwordHash);
         return info.lastInsertRowid as number;
     } catch (error: any) {
         if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
@@ -43,8 +67,7 @@ export function createUser(username: string, passwordHash: string): number {
  * @returns User object if found, undefined otherwise.
  */
 export function getUserByUsername(username: string): User | undefined {
-    const stmt = db.prepare("SELECT * FROM USERS WHERE username = ?");
-    const row = stmt.get(username) as UserRow | undefined;
+    const row = selectByUsernameStmt.get(username) as UserRow | undefined;
     return row ? mapUser(row) : undefined;
 }
 
@@ -54,8 +77,7 @@ export function getUserByUsername(username: string): User | undefined {
  * @returns User object if found, undefined otherwise.
  */
 export function getUserById(id: number): User | undefined {
-    const stmt = db.prepare("SELECT * FROM USERS WHERE id = ?");
-    const row = stmt.get(id) as UserRow | undefined;
+    const row = selectByIdStmt.get(id) as UserRow | undefined;
     return row ? mapUser(row) : undefined;
 }
 
@@ -68,8 +90,7 @@ export function updateUserRegionPreference(
     userId: number,
     regionId: number,
 ): void {
-    const stmt = db.prepare("UPDATE USERS SET region_id_pref = ? WHERE id = ?");
-    const result = stmt.run(regionId, userId);
+    const result = updateRegionStmt.run(regionId, userId);
     if (result.changes === 0) {
         throw new Error(`User with ID ${userId} not found.`);
     }
@@ -84,8 +105,7 @@ export function updateUserThemePreference(
     userId: number,
     themeId: number,
 ): void {
-    const stmt = db.prepare("UPDATE USERS SET theme_id = ? WHERE id = ?");
-    const result = stmt.run(themeId, userId);
+    const result = updateThemeStmt.run(themeId, userId);
     if (result.changes === 0) {
         throw new Error(`User with ID ${userId} not found.`);
     }
@@ -103,11 +123,5 @@ export function setUserTypePreference(
     isWanted: boolean,
 ): void {
     const isWantedInt = isWanted ? 1 : 0;
-    const stmt = db.prepare(`
-        INSERT INTO USER_TYPE_PREFS (user_id, type_id, is_wanted)
-        VALUES (?, ?, ?)
-        ON CONFLICT(user_id, type_id) DO UPDATE SET
-            is_wanted = excluded.is_wanted
-    `);
-    stmt.run(userId, typeId, isWantedInt);
+    upsertTypePrefStmt.run(userId, typeId, isWantedInt);
 }
