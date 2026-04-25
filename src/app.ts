@@ -6,6 +6,8 @@ import expressLayouts from 'express-ejs-layouts';
 import morgan from 'morgan';
 
 import logger from './utils/logger';
+import authRouter from './routes/auth';
+import matchRouter from './routes/match';
 
 const app = express();
 
@@ -23,14 +25,18 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.use(session({
-    secret: 'super_secret_dexmatch_key_123',
+    secret: process.env.SESSION_SECRET || 'dev_secret_change_in_production',
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false }
 }));
 
 app.get('/', (req, res) => {
-    res.render('login');
+    if (req.session.userId) return res.redirect('/swipe');
+    res.render('login', { error: null });
 });
+
+app.use(authRouter);
+app.use(matchRouter);
 
 export { app };
