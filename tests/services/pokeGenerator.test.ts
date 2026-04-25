@@ -21,6 +21,8 @@ jest.mock("@faker-js/faker", () => ({
 // Mock logger
 jest.mock("../../src/utils/logger", () => ({
     info: jest.fn(),
+    debug: jest.fn(),
+    error: jest.fn(),
 }));
 
 // Mock getBellCurveRandom
@@ -40,6 +42,8 @@ describe("generatePokemon", () => {
         // Reset mocks before each test
         (faker.person.firstName as jest.Mock).mockClear();
         (logger.info as jest.Mock).mockClear();
+        (logger.debug as jest.Mock).mockClear();
+        (logger.error as jest.Mock).mockClear();
         (getBellCurveRandom as jest.Mock).mockClear();
         (getRandomIndices as jest.Mock).mockClear();
 
@@ -60,8 +64,9 @@ describe("generatePokemon", () => {
                 spDef: 65,
                 speed: 45,
             },
+            types: ["Grass", "Poison"],
             isLegendary: false,
-            evolvedLevel: 16,
+            minEvolvedLevel: 16,
             chanseForMale: 0.875,
             LocationIds: [1, 2, 3],
         };
@@ -75,12 +80,16 @@ describe("generatePokemon", () => {
 
     it("should generate a Pokémon with correct species data and a random human name", () => {
         const mockFirstName = "Josh";
+        const mockJoke = "Chuck Norris caught all Pokémon. With a landline.";
         (faker.person.firstName as jest.Mock).mockReturnValue(mockFirstName);
-        // Default mocks for randomizeSize to ensure predictable attributes
-        (getBellCurveRandom as jest.Mock).mockReturnValue(0.5); // sizeGene = 0.5
-        jest.spyOn(Math, "random").mockReturnValue(0.5); // Math.random for heightWobble and IVs
+        // Default mocks to ensure predictable attributes
+        (getBellCurveRandom as jest.Mock).mockReturnValue(0.5); // sizeGene & generateLevel = 0.5
+        jest.spyOn(Math, "random").mockReturnValue(0.5); // Math.random for heightWobble, IVs, and isShiny
 
-        const generatedPokemon: Pokemon = generatePokemon(mockSpeciesData);
+        const generatedPokemon: Pokemon = generatePokemon(
+            mockSpeciesData,
+            mockJoke,
+        );
 
         expect(generatedPokemon).toBeDefined();
         expect(generatedPokemon.speciesId).toBe(mockSpeciesData.id);
@@ -116,19 +125,23 @@ describe("generatePokemon", () => {
             speed: 16,
         });
         expect(generatedPokemon.isShiny).toBe(false);
-        expect(generatedPokemon.level).toBe(1);
-        expect(generatedPokemon.description).toBe("");
+        expect(generatedPokemon.level).toBe(16); // 16 + |0.5 - 0.5| * 2 * (100 - 16) = 16
+        expect(generatedPokemon.description).toBe(mockJoke);
         expect(generatedPokemon.id).toBe(0);
     });
 
     it("should log the generation of the Pokémon with its name and species name", () => {
         const mockFirstName = "Sarah";
+        const mockJoke = "Joke";
         (faker.person.firstName as jest.Mock).mockReturnValue(mockFirstName);
         // Default mocks for randomizeSize and IVs to prevent calculation errors
         (getBellCurveRandom as jest.Mock).mockReturnValue(0.5);
         jest.spyOn(Math, "random").mockReturnValue(0.5);
 
-        const generatedPokemon: Pokemon = generatePokemon(mockSpeciesData);
+        const generatedPokemon: Pokemon = generatePokemon(
+            mockSpeciesData,
+            mockJoke,
+        );
 
         expect(logger.info).toHaveBeenCalledTimes(1);
         expect(logger.info).toHaveBeenCalledWith(
@@ -145,8 +158,8 @@ describe("generatePokemon", () => {
         (getBellCurveRandom as jest.Mock).mockReturnValue(0.5);
         jest.spyOn(Math, "random").mockReturnValue(0.5);
 
-        const pokemon1 = generatePokemon(mockSpeciesData);
-        const pokemon2 = generatePokemon(mockSpeciesData);
+        const pokemon1 = generatePokemon(mockSpeciesData, "Joke 1");
+        const pokemon2 = generatePokemon(mockSpeciesData, "Joke 2");
 
         expect(pokemon1.name).toBe("Alice");
         expect(pokemon2.name).toBe("Bob");
@@ -169,7 +182,10 @@ describe("generatePokemon", () => {
                 .mockReturnValueOnce(0) // Math.random for heightWobble
                 .mockReturnValue(0.5); // Math.random for IVs
 
-            const generatedPokemon: Pokemon = generatePokemon(mockSpeciesData);
+            const generatedPokemon: Pokemon = generatePokemon(
+                mockSpeciesData,
+                "Joke",
+            );
             const modifiedAttributes = generatedPokemon.attributes;
 
             // Weight multiplier = 0 * (1.4 - 0.6) + 0.6 = 0.6
@@ -194,7 +210,10 @@ describe("generatePokemon", () => {
                 .mockReturnValue(0.5); // Math.random for IVs
             // 0.999 * 0.2 - 0.1 = 0.1998 - 0.1 = 0.0998
 
-            const generatedPokemon: Pokemon = generatePokemon(mockSpeciesData);
+            const generatedPokemon: Pokemon = generatePokemon(
+                mockSpeciesData,
+                "Joke",
+            );
             const modifiedAttributes = generatedPokemon.attributes;
 
             // Weight multiplier = 1 * (1.4 - 0.6) + 0.6 = 1.4
@@ -218,7 +237,10 @@ describe("generatePokemon", () => {
                 .mockReturnValueOnce(0.5) // Math.random for heightWobble
                 .mockReturnValue(0.5); // Math.random for IVs
 
-            const generatedPokemon: Pokemon = generatePokemon(mockSpeciesData);
+            const generatedPokemon: Pokemon = generatePokemon(
+                mockSpeciesData,
+                "Joke",
+            );
             const modifiedAttributes = generatedPokemon.attributes;
 
             // Weight multiplier = 0.5 * (1.4 - 0.6) + 0.6 = 1.0
@@ -239,7 +261,10 @@ describe("generatePokemon", () => {
                 .mockReturnValueOnce(0.9) // heightWobble
                 .mockReturnValue(0.5); // IVs
 
-            const generatedPokemon: Pokemon = generatePokemon(mockSpeciesData);
+            const generatedPokemon: Pokemon = generatePokemon(
+                mockSpeciesData,
+                "Joke",
+            );
             const modifiedAttributes = generatedPokemon.attributes;
 
             expect(modifiedAttributes.nature_id).toBe(
@@ -263,7 +288,10 @@ describe("generatePokemon", () => {
                 .mockReturnValueOnce(0.1) // Math.random for heightWobble
                 .mockReturnValue(0.5); // Math.random for IVs
 
-            const generatedPokemon: Pokemon = generatePokemon(mockSpeciesData);
+            const generatedPokemon: Pokemon = generatePokemon(
+                mockSpeciesData,
+                "Joke",
+            );
             const modifiedAttributes = generatedPokemon.attributes;
 
             // Weight multiplier = 0.1 * 0.8 + 0.6 = 0.68
@@ -295,7 +323,10 @@ describe("generatePokemon", () => {
                 .mockReturnValueOnce(0.99) // SpDef: floor(0.99 * 32) = 31
                 .mockReturnValueOnce(0.3); // Speed: floor(0.3 * 32) = 9
 
-            const generatedPokemon: Pokemon = generatePokemon(mockSpeciesData);
+            const generatedPokemon: Pokemon = generatePokemon(
+                mockSpeciesData,
+                "Joke",
+            );
 
             expect(generatedPokemon.statsIV).toEqual({
                 hp: 3,
@@ -325,7 +356,10 @@ describe("generatePokemon", () => {
                 .mockReturnValueOnce(0.9) // SpAtk (since Def is 31) -> floor(0.9 * 32) = 28
                 .mockReturnValueOnce(0.5); // SpDef (since Speed is 31) -> floor(0.5 * 32) = 16
 
-            const generatedPokemon: Pokemon = generatePokemon(mockSpeciesData);
+            const generatedPokemon: Pokemon = generatePokemon(
+                mockSpeciesData,
+                "Joke",
+            );
 
             expect(getRandomIndices).toHaveBeenCalledWith(6, 3);
             expect(generatedPokemon.statsIV).toEqual({
@@ -362,7 +396,10 @@ describe("generatePokemon", () => {
                 .mockReturnValueOnce(0.666) // SpDef
                 .mockReturnValueOnce(0.999); // Speed
 
-            const generatedPokemon: Pokemon = generatePokemon(mockSpeciesData);
+            const generatedPokemon: Pokemon = generatePokemon(
+                mockSpeciesData,
+                "Joke",
+            );
 
             expect(generatedPokemon.statsIV.hp).toBe(31);
             expect(generatedPokemon.statsIV.atk).toBe(31);
@@ -374,6 +411,105 @@ describe("generatePokemon", () => {
             Object.values(generatedPokemon.statsIV).forEach((iv) => {
                 expect(iv).toBe(Math.floor(iv)); // Ensure it's an integer
             });
+        });
+    });
+
+    describe("generateLevel effects (indirectly via generatePokemon)", () => {
+        beforeEach(() => {
+            (getBellCurveRandom as jest.Mock).mockReturnValue(0.5);
+            jest.spyOn(Math, "random").mockReturnValue(0.5);
+        });
+
+        it("should generate max level 100 if minLevel is greater than or equal to 100", () => {
+            const modifiedData = {
+                ...mockSpeciesData,
+                minEvolvedLevel: 105,
+            };
+            const pokemon = generatePokemon(modifiedData, "Joke");
+            expect(pokemon.level).toBe(100);
+            expect(logger.error).toHaveBeenCalledWith(
+                "MinLevel >= maxLevel: 105 >= 100",
+                { data: { minLevel: 105, maxLevel: 100 } },
+            );
+        });
+
+        it("should generate level close to minLevel when curve is 0.5", () => {
+            // sizeGene uses first call, level uses second call
+            (getBellCurveRandom as jest.Mock)
+                .mockReturnValueOnce(0.5) // sizeGene
+                .mockReturnValueOnce(0.5); // baseCurve for level
+
+            const pokemon = generatePokemon(mockSpeciesData, "Joke");
+            // |0.5 - 0.5| * 2 = 0
+            // 16 + 0 = 16
+            expect(pokemon.level).toBe(16);
+        });
+
+        it("should generate higher level when curve is far from 0.5", () => {
+            (getBellCurveRandom as jest.Mock)
+                .mockReturnValueOnce(0.5) // sizeGene
+                .mockReturnValueOnce(0.9); // baseCurve for level
+
+            const pokemon = generatePokemon(mockSpeciesData, "Joke");
+            // |0.9 - 0.5| * 2 = 0.8
+            // 16 + floor(0.8 * (100 - 16)) = 16 + floor(0.8 * 84) = 16 + 67 = 83
+            expect(pokemon.level).toBe(83);
+        });
+
+        it("should generate higher level when curve is far below 0.5", () => {
+            (getBellCurveRandom as jest.Mock)
+                .mockReturnValueOnce(0.5) // sizeGene
+                .mockReturnValueOnce(0.1); // baseCurve for level
+
+            const pokemon = generatePokemon(mockSpeciesData, "Joke");
+            // |0.1 - 0.5| * 2 = 0.8
+            // 16 + floor(0.8 * 84) = 83
+            expect(pokemon.level).toBe(83);
+        });
+    });
+
+    describe("isShiny effects (indirectly via generatePokemon)", () => {
+        beforeEach(() => {
+            (getBellCurveRandom as jest.Mock).mockReturnValue(0.5);
+            mockSpeciesData.isLegendary = false; // ensure exactly 6 IV rolls
+        });
+
+        it("should mark pokemon as shiny when roll matches 151", () => {
+            // Math.random calls:
+            // 1 for heightWobble
+            // 6 for IVs
+            // 1 for isShiny
+            jest.spyOn(Math, "random")
+                .mockReturnValueOnce(0.5) // heightWobble
+                .mockReturnValueOnce(0.5) // hp
+                .mockReturnValueOnce(0.5) // atk
+                .mockReturnValueOnce(0.5) // def
+                .mockReturnValueOnce(0.5) // spAtk
+                .mockReturnValueOnce(0.5) // spDef
+                .mockReturnValueOnce(0.5) // speed
+                .mockReturnValueOnce(151 / 4096); // isShiny roll exactly matching 151
+
+            const pokemon = generatePokemon(mockSpeciesData, "Joke");
+            expect(pokemon.isShiny).toBe(true);
+        });
+
+        it("should not mark pokemon as shiny when roll does not match 151", () => {
+            // Math.random calls:
+            // 1 for heightWobble
+            // 6 for IVs
+            // 1 for isShiny
+            jest.spyOn(Math, "random")
+                .mockReturnValueOnce(0.5) // heightWobble
+                .mockReturnValueOnce(0.5) // hp
+                .mockReturnValueOnce(0.5) // atk
+                .mockReturnValueOnce(0.5) // def
+                .mockReturnValueOnce(0.5) // spAtk
+                .mockReturnValueOnce(0.5) // spDef
+                .mockReturnValueOnce(0.5) // speed
+                .mockReturnValueOnce(150 / 4096); // isShiny roll = 150
+
+            const pokemon = generatePokemon(mockSpeciesData, "Joke");
+            expect(pokemon.isShiny).toBe(false);
         });
     });
 });
