@@ -3,7 +3,6 @@
 
     From requirements:
     TODO: Each pokémon should have a picture.
-    TODO:
     TODO: Each pokemon will have a Chuck Norris joke as a description.
 
     Static pokémon attributes:
@@ -159,7 +158,7 @@ export default function generatePokemon(
         level: generateLevel(speciesData.minEvolvedLevel),
         attributes: attr, // REQUIREMENT: Each pokémon should have basic information (e.g. type, weight, skill, height, lvl).
         statsIV: generatePokemonIVs(speciesData.isLegendary),
-        isShiny: false, // TODO: Implement function to calculate if shiny
+        isShiny: isShiny(),
     };
 
     logger.info(
