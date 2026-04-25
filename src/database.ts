@@ -1,10 +1,12 @@
-import path from 'path';
-import Database from 'better-sqlite3';
+import path from "path";
+import Database from "better-sqlite3";
 
-const dbPath = path.join(import.meta.dirname, 'database.sqlite');
+import logger from "./utils/logger";
+
+const dbPath = path.join(__dirname, "database.sqlite");
 const db = new Database(dbPath, { verbose: console.log });
 
-db.pragma('foreign_keys = ON');
+db.pragma("foreign_keys = ON");
 
 const initDB = () => {
     db.exec(`
@@ -14,25 +16,23 @@ const initDB = () => {
             display_name TEXT,
             password_hash TEXT NOT NULL,
             region_id_pref INTEGER,
-            theme INTEGER DEFAULT 0
+            theme_id INTEGER DEFAULT 0
         );
 
         CREATE TABLE IF NOT EXISTS USER_TYPE_PREFS (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
-            type INTEGER NOT NULL,
+            type_id INTEGER NOT NULL,
             is_wanted BOOLEAN NOT NULL CHECK (is_wanted IN (0, 1)),
             FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE
         );
 
-        CREATE TABLE IF NOT EXISTS POKEMONS (
+        CREATE TABLE IF NOT EXISTS POKEMON (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             species_id INTEGER NOT NULL,
             name TEXT NOT NULL,
-            primary_type_id INTEGER,
-            secondary_type_id INTEGER,
-            area_id INTEGER,
-            gender STRING,
+            location_id INTEGER,
+            gender INTEGER,
             weight INTEGER,
             height INTEGER,
             level INTEGER,
@@ -53,11 +53,11 @@ const initDB = () => {
             is_liked BOOLEAN NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE,
-            FOREIGN KEY (pokemon_id) REFERENCES POKEMONS(id) ON DELETE CASCADE,
+            FOREIGN KEY (pokemon_id) REFERENCES POKEMON(id) ON DELETE CASCADE,
             UNIQUE(user_id, pokemon_id)
         );
     `);
-    console.log("Database initialized successfully!");
+    logger.info("Database initialized successfully!");
 };
 
 initDB();
