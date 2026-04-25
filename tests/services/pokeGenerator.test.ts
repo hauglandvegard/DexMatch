@@ -1,4 +1,4 @@
-import { generatePokemon } from "../../src/services/pokeGenerator";
+import generatePokemon from "../../src/services/pokeGenerator";
 import {
     CleanSpeciesData,
     Pokemon,
