@@ -1,14 +1,28 @@
 import path from "path";
+import fs from "fs";
 import Database from "better-sqlite3";
 
 import logger from "./utils/logger";
 
-const dbPath = path.join(__dirname, "database.sqlite");
-const db = new Database(dbPath, { verbose: console.log });
+const dbPath =
+    process.env.DB_PATH ||
+    path.join(__dirname, "..", "data", "database.sqlite");
 
+if (dbPath !== ":memory:") {
+    const dataDir = path.dirname(dbPath);
+    if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+    }
+}
+
+const db = new Database(dbPath);
+
+// Production best practices for SQLite
 db.pragma("foreign_keys = ON");
+db.pragma("journal_mode = WAL");
+db.pragma("synchronous = NORMAL");
 
-const initDB = () => {
+export const initDB = () => {
     db.exec(`
         CREATE TABLE IF NOT EXISTS USERS (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -24,7 +38,8 @@ const initDB = () => {
             user_id INTEGER NOT NULL,
             type_id INTEGER NOT NULL,
             is_wanted BOOLEAN NOT NULL CHECK (is_wanted IN (0, 1)),
-            FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE
+            FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE,
+            UNIQUE(user_id, type_id)
         );
 
         CREATE TABLE IF NOT EXISTS POKEMON (
@@ -60,6 +75,10 @@ const initDB = () => {
     logger.info("Database initialized successfully!");
 };
 
-initDB();
+// Graceful shutdown
+process.on("exit", () => db.close());
+process.on("SIGHUP", () => process.exit(128 + 1));
+process.on("SIGINT", () => process.exit(128 + 2));
+process.on("SIGTERM", () => process.exit(128 + 15));
 
 export default db;
