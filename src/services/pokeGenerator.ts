@@ -3,7 +3,7 @@
 
     From requirements:
     TODO: Each pokémon should have a picture.
-    TODO: Each pokémon should have asic information (e.g. type, weight, skill, height, lvl).
+    TODO:
     TODO: Each pokemon will have a Chuck Norris joke as a description.
 
     Static pokémon attributes:
@@ -54,6 +54,15 @@ function randomizeSize(attr: PokeAttributes): PokeAttributes {
 
     attr.height = Math.floor(attr.height * heightMultiplier);
 
+    logger.debug("Successfully randomized size", {
+        data: {
+            weightMult: weightMultiplier,
+            weightRes: attr.weight,
+            heightMult: heightMultiplier,
+            heightRes: attr.height,
+        },
+    });
+
     return attr;
 }
 
@@ -82,7 +91,7 @@ function generatePokemonIVs(isLegendary: boolean): PokeStats {
         ivs.push(stat);
     }
 
-    return {
+    const statIVs: PokeStats = {
         hp: ivs[0],
         atk: ivs[1],
         def: ivs[2],
@@ -90,6 +99,32 @@ function generatePokemonIVs(isLegendary: boolean): PokeStats {
         spDef: ivs[4],
         speed: ivs[5],
     };
+
+    logger.debug("Successfully generated IVs", { data: statIVs });
+
+    return statIVs;
+}
+
+function generateLevel(minLevel: number): number {
+    const maxLevel = 100;
+
+    if (minLevel >= maxLevel) {
+        logger.error(`MinLevel >= maxLevel: ${minLevel} >= ${maxLevel}`, {
+            data: { minLevel: minLevel, maxLevel: maxLevel },
+        });
+        return maxLevel;
+    }
+
+    const baseCurve = getBellCurveRandom();
+    const foldedCurve = Math.abs(baseCurve - 0.5) * 2;
+    const availableRange = maxLevel - minLevel;
+    const addedLevels = Math.floor(foldedCurve * availableRange);
+
+    const level = minLevel + addedLevels;
+
+    logger.debug("Successfully generated level", { data: level });
+
+    return level;
 }
 
 export function generatePokemon(speciesData: CleanSpeciesData): Pokemon {
@@ -100,8 +135,8 @@ export function generatePokemon(speciesData: CleanSpeciesData): Pokemon {
         name: faker.person.firstName(), // REQUIREMENT: Each pokémon should have a random human name. I.e. Josh the Charmander
         speciesId: speciesData.id,
         description: "", // TODO: Set up the Chuck Norries joke import
-        level: 1, // TODO: Implement function to calculate level
-        attributes: attr,
+        level: generateLevel(speciesData.minEvolvedLevel),
+        attributes: attr, // REQUIREMENT: Each pokémon should have basic information (e.g. type, weight, skill, height, lvl).
         statsIV: generatePokemonIVs(speciesData.isLegendary),
         isShiny: false, // TODO: Implement function to calculate if shiny
     };
