@@ -25,3 +25,11 @@ export interface PokemonRow {
     iv_speed: number;
     is_shiny: number;
 }
+
+export interface SwipeRow {
+    id: number;
+    user_id: number;
+    pokemon_id: number;
+    is_liked: number;
+    created_at: string;
+}
