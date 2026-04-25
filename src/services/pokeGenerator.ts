@@ -26,7 +26,7 @@ import { faker } from "@faker-js/faker";
 import { getBellCurveRandom } from "../utils/mathUtils";
 import { getRandomIndices } from "../utils/arrayUtils";
 import {
-    Pokemon,
+    DraftPokemon,
     PokeSize,
     PokeStats,
     CleanSpeciesData,
@@ -40,30 +40,30 @@ import logger from "../utils/logger";
  * * @param {PokeAttributes} attr - The base attributes object containing initial height and weight.
  * @returns {PokeAttributes} The mutated attributes object with randomized size values.
  */
-function randomizeSize(attr: PokeSize): PokeSize {
+function randomizeSize(baseSize: PokeSize): PokeSize {
     const sizeGene = getBellCurveRandom();
 
     // Weight variance: 0.6x to 1.4x
     const weightMultiplier = sizeGene * (1.4 - 0.6) + 0.6;
 
-    attr.weight = Math.floor(attr.weight * weightMultiplier);
+    const weight = Math.floor(baseSize.weight * weightMultiplier);
 
     // Height variance: 0.8x to 1.2x (with a +/- 10% wobble)
     const heightWobble = Math.random() * 0.2 - 0.1;
     const heightMultiplier = sizeGene * (1.2 - 0.8) + 0.8 + heightWobble;
 
-    attr.height = Math.floor(attr.height * heightMultiplier);
+    const height = Math.floor(baseSize.height * heightMultiplier);
 
     logger.debug("Successfully randomized size", {
         data: {
             weightMult: weightMultiplier,
-            weightRes: attr.weight,
+            weightRes: weight,
             heightMult: heightMultiplier,
-            heightRes: attr.height,
+            heightRes: height,
         },
     });
 
-    return attr;
+    return { height, weight };
 }
 
 /**
@@ -163,21 +163,20 @@ function pickNature(): number {
 export default function generatePokemon(
     speciesData: CleanSpeciesData,
     chuckNorrisJoke: string,
-): Pokemon {
-    const size = randomizeSize(speciesData.size);
+): DraftPokemon {
+    const size = randomizeSize(speciesData.baseSize);
 
-    const pokemon: Pokemon = {
-        id: 0, // TODO: Set up call to database to get a unique id.
+    const pokemon: DraftPokemon = {
         name: faker.person.firstName(), // REQUIREMENT: Each pokémon should have a random human name. I.e. Josh the Charmander.
         speciesId: speciesData.id,
-        nature_id: pickNature(),
         description: chuckNorrisJoke, // REQUIREMENT: Each pokemon will have a Chuck Norris joke as a description.
+        gender: Gender.GENDERLESS, // HACK: Implement gender selection.
         level: generateLevel(speciesData.minEvolvedLevel),
         size: size, // REQUIREMENT: Each pokémon should have basic information (e.g. type, weight, skill, height, lvl).
-        locationId: 0, // TODO: Implement a random location selection within the region.
-        gender: Gender.GENDERLESS, // TODO: Implement gender selection.
-        statsIV: generateIVs(speciesData.isLegendary),
         isShiny: isShiny(),
+        statsIV: generateIVs(speciesData.isLegendary),
+        natureId: pickNature(),
+        locationId: 0, // HACK: Implement a function to pick random location selection within the region.
     };
 
     logger.info(
