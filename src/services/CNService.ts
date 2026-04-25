@@ -11,11 +11,14 @@ import logger from "../utils/logger";
 const CHUCK_API_BASE = "https://api.chucknorris.io/jokes";
 
 /**
- * Fetches a pseudorandom Chuck Norris joke from https://api.chucknorris.io/jokes.
- * * @param pokemonType - The pokemon type that the joke should be tailored to.
- * @returns The Chuck Norris joke.
+ * Fetches a Chuck Norris joke related to a specific Pokémon type from an external API.
+ * Features cascading fallbacks to ensure a joke is always returned.
+ * * @param {string} pokemonType - The Pokémon type to use as the search query.
+ * @returns {Promise<string>} A promise that resolves to the joke string.
  */
-export async function getJokeForType(pokemonType: string): Promise<string> {
+export default async function getJokeForType(
+    pokemonType: string,
+): Promise<string> {
     try {
         // REQUIRMENT: The joke should be connected to the pokemons type.
         const searchUrl = `${CHUCK_API_BASE}/search?query=${pokemonType}`;
