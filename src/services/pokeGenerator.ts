@@ -145,6 +145,14 @@ function isShiny(): boolean {
 }
 
 /**
+ * Generates a random Pokémon nature index.
+ * * @returns {number} An integer from 0 to 24, corresponding to the 25 standard natures.
+ */
+function pickNature(): number {
+    return Math.floor(Math.random() * 25);
+}
+
+/**
  * Synchronously generates a fully realized, unique individual Pokémon based on base species data.
  * Requires a pre-fetched description (joke) to avoid blocking network calls during generation.
  * * @param {CleanSpeciesData} speciesData - The base rules and stats for the specific Pokémon species.
@@ -161,7 +169,7 @@ export default function generatePokemon(
         id: 0, // TODO: Set up call to database to get a unique id
         name: faker.person.firstName(), // REQUIREMENT: Each pokémon should have a random human name. I.e. Josh the Charmander
         speciesId: speciesData.id,
-        nature_id: 0, // TODO: Implement randomizer
+        nature_id: pickNature(),
         description: chuckNorrisJoke, // REQUIREMENT: Each pokemon will have a Chuck Norris joke as a description.
         level: generateLevel(speciesData.minEvolvedLevel),
         size: size, // REQUIREMENT: Each pokémon should have basic information (e.g. type, weight, skill, height, lvl).
