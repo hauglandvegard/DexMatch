@@ -30,6 +30,7 @@ import {
     PokeSize,
     PokeStats,
     CleanSpeciesData,
+    Gender,
 } from "../types/pokemon.types";
 import logger from "../utils/logger";
 
@@ -166,13 +167,15 @@ export default function generatePokemon(
     const size = randomizeSize(speciesData.size);
 
     const pokemon: Pokemon = {
-        id: 0, // TODO: Set up call to database to get a unique id
-        name: faker.person.firstName(), // REQUIREMENT: Each pokémon should have a random human name. I.e. Josh the Charmander
+        id: 0, // TODO: Set up call to database to get a unique id.
+        name: faker.person.firstName(), // REQUIREMENT: Each pokémon should have a random human name. I.e. Josh the Charmander.
         speciesId: speciesData.id,
         nature_id: pickNature(),
         description: chuckNorrisJoke, // REQUIREMENT: Each pokemon will have a Chuck Norris joke as a description.
         level: generateLevel(speciesData.minEvolvedLevel),
         size: size, // REQUIREMENT: Each pokémon should have basic information (e.g. type, weight, skill, height, lvl).
+        locationId: 0, // TODO: Implement a random location selection within the region.
+        gender: Gender.GENDERLESS, // TODO: Implement gender selection.
         statsIV: generateIVs(speciesData.isLegendary),
         isShiny: isShiny(),
     };

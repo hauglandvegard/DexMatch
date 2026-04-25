@@ -15,6 +15,8 @@ export interface Pokemon {
     id: number;
     name: string;
     speciesId: number;
+    locationId: number;
+    gender: Gender;
     description: string;
     level: number;
     size: PokeSize;
