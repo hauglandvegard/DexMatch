@@ -64,8 +64,7 @@ describe("Pokemon Model Tests", () => {
             expect(pokemon?.statsIV.speed).toBe(mockPokemonData.statsIV.speed);
             expect(pokemon?.isShiny).toBe(mockPokemonData.isShiny);
             expect(pokemon?.natureId).toBe(mockPokemonData.natureId);
-            // The getPokemonById explicitly hardcodes description to an empty string in current impl
-            expect(pokemon?.description).toBe("");
+            expect(pokemon?.description).toBe(mockPokemonData.description);
         });
 
         it("should return undefined for a non-existent id", () => {
