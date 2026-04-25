@@ -3,7 +3,6 @@
 
     From requirements:
     TODO: Each pokémon should have a picture.
-    TODO: Each pokemon will have a Chuck Norris joke as a description.
 
     Static pokémon attributes:
     - Base stats
@@ -145,8 +144,16 @@ function isShiny(): boolean {
     return roll === 151;
 }
 
+/**
+ * Synchronously generates a fully realized, unique individual Pokémon based on base species data.
+ * Requires a pre-fetched description (joke) to avoid blocking network calls during generation.
+ * * @param {CleanSpeciesData} speciesData - The base rules and stats for the specific Pokémon species.
+ * @param {string} chuckNorrisJoke - A pre-fetched string to use as the Pokémon's description.
+ * @returns {Pokemon} A complete Pokémon object with randomized IVs, size, level, name, and shiny status.
+ */
 export default function generatePokemon(
     speciesData: CleanSpeciesData,
+    chuckNorrisJoke: string,
 ): Pokemon {
     const attr = randomizeSize(speciesData.attributs);
 
@@ -154,7 +161,7 @@ export default function generatePokemon(
         id: 0, // TODO: Set up call to database to get a unique id
         name: faker.person.firstName(), // REQUIREMENT: Each pokémon should have a random human name. I.e. Josh the Charmander
         speciesId: speciesData.id,
-        description: "", // TODO: Set up the Chuck Norries joke import
+        description: chuckNorrisJoke, // REQUIREMENT: Each pokemon will have a Chuck Norris joke as a description.
         level: generateLevel(speciesData.minEvolvedLevel),
         attributes: attr, // REQUIREMENT: Each pokémon should have basic information (e.g. type, weight, skill, height, lvl).
         statsIV: generatePokemonIVs(speciesData.isLegendary),
