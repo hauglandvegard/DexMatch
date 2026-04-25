@@ -1,11 +1,11 @@
-import { app } from "./app";
-import logger from "./utils/logger";
 import { initDB } from "./database";
 
-const PORT = process.env.PORT || 3000;
-
-// Init DB before listening
 initDB();
+
+import { app } from "./app";
+import logger from "./utils/logger";
+
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
     logger.info(`DexMatch is live at http://localhost:${PORT}`);
