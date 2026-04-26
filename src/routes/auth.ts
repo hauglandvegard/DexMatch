@@ -11,21 +11,26 @@ const router = Router();
 router.post('/login', async (req, res) => {
     const result = loginSchema.safeParse(req.body);
     if (!result.success) {
-        const error = result.error.issues[0].message;
-        return res.render('login', { error, activeTab: 'login' });
+        res.locals.error = result.error.issues[0].message;
+        res.locals.activeTab = 'login';
+        return res.render('login');
     }
 
     const { username, password } = result.data;
 
     const user = getUserByUsername(username);
     if (!user) {
-        return res.render('login', { error: 'Invalid username or password.', activeTab: 'login' });
+        res.locals.error = 'Invalid username or password.';
+        res.locals.activeTab = 'login';
+        return res.render('login');
     }
 
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) {
         logger.warn('Failed login attempt', { username });
-        return res.render('login', { error: 'Invalid username or password.', activeTab: 'login' });
+        res.locals.error = 'Invalid username or password.';
+        res.locals.activeTab = 'login';
+        return res.render('login');
     }
 
     req.session.userId = user.id;
@@ -35,21 +40,24 @@ router.post('/login', async (req, res) => {
 router.post('/register', async (req, res) => {
     const result = registerSchema.safeParse(req.body);
     if (!result.success) {
-        const error = result.error.issues[0].message;
-        return res.render('login', { error, activeTab: 'register' });
+        res.locals.error = result.error.issues[0].message;
+        res.locals.activeTab = 'register';
+        return res.render('login');
     }
 
-    const { username, password } = result.data;
+    const { username, password, displayName } = result.data;
     const passwordHash = await bcrypt.hash(password, 12);
 
     try {
-        const userId = createUser(username, passwordHash);
+        const userId = createUser(username, passwordHash, displayName);
         req.session.userId = userId;
         logger.info('New user registered', { username, userId });
         res.redirect('/swipe');
     } catch (error) {
         if (error instanceof ConflictError) {
-            return res.render('login', { error: error.message, activeTab: 'register' });
+            res.locals.error = error.message;
+            res.locals.activeTab = 'register';
+            return res.render('login');
         }
         throw error;
     }

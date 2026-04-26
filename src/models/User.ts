@@ -18,7 +18,7 @@ function mapUser(row: UserRow): User {
 }
 
 const insertUserStmt = db.prepare(
-    "INSERT INTO USERS (username, password_hash) VALUES (?, ?)",
+    "INSERT INTO USERS (username, password_hash, display_name) VALUES (?, ?, ?)",
 );
 
 const selectByUsernameStmt = db.prepare(
@@ -49,9 +49,9 @@ const upsertTypePrefStmt = db.prepare(`
  * @returns ID of newly created user.
  * @throws Error if username already exists or other DB constraints fail.
  */
-export function createUser(username: string, passwordHash: string): number {
+export function createUser(username: string, passwordHash: string, displayName?: string): number {
     try {
-        const info = insertUserStmt.run(username, passwordHash);
+        const info = insertUserStmt.run(username, passwordHash, displayName ?? null);
         return info.lastInsertRowid as number;
     } catch (error: any) {
         if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
