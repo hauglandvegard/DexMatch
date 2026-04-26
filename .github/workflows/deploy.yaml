@@ -49,6 +49,8 @@ jobs:
                   port: ${{ secrets.REMOTE_PORT }}
                   script: |
                       set -e
+                      export NVM_DIR="$HOME/.nvm"
+                      source "$NVM_DIR/nvm.sh"
                       cd /var/www/dex-match
                       npm ci --omit=dev
                       mkdir -p data logs
