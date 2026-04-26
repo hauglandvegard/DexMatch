@@ -33,7 +33,7 @@ app.use(session({
 
 app.get('/', (req, res) => {
     if (req.session.userId) return res.redirect('/swipe');
-    res.render('login', { error: null });
+    res.render('login', { error: null, activeTab: 'login' });
 });
 
 app.use(authRouter);

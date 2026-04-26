@@ -9,12 +9,12 @@
         </div>
     <% } %>
 
-    <div class="tabs tabs-boxed mb-6 w-full justify-center" id="auth-tabs">
-        <a class="tab tab-active" onclick="showTab('login')">Login</a>
-        <a class="tab" onclick="showTab('register')">Register</a>
+    <div class="tabs tabs-boxed mb-6 w-full justify-center">
+        <a class="tab <%= activeTab === 'login' ? 'tab-active' : '' %>" onclick="showTab('login')">Login</a>
+        <a class="tab <%= activeTab === 'register' ? 'tab-active' : '' %>" onclick="showTab('register')">Register</a>
     </div>
 
-    <div id="login-form" class="card bg-base-100 shadow-xl w-full">
+    <div id="login-form" class="card bg-base-100 shadow-xl w-full <%= activeTab === 'login' ? '' : 'hidden' %>">
         <div class="card-body">
             <form method="POST" action="/login">
                 <div class="form-control mb-4">
@@ -30,16 +30,18 @@
         </div>
     </div>
 
-    <div id="register-form" class="card bg-base-100 shadow-xl w-full hidden">
+    <div id="register-form" class="card bg-base-100 shadow-xl w-full <%= activeTab === 'register' ? '' : 'hidden' %>">
         <div class="card-body">
             <form method="POST" action="/register">
                 <div class="form-control mb-4">
                     <label class="label"><span class="label-text">Username</span></label>
                     <input type="text" name="username" class="input input-bordered" placeholder="ash_ketchum" required />
+                    <label class="label"><span class="label-text-alt text-base-content/50">3–20 chars, letters/numbers/underscores</span></label>
                 </div>
                 <div class="form-control mb-6">
                     <label class="label"><span class="label-text">Password</span></label>
                     <input type="password" name="password" class="input input-bordered" placeholder="••••••••" required />
+                    <label class="label"><span class="label-text-alt text-base-content/50">Min 8 characters</span></label>
                 </div>
                 <button class="btn btn-primary w-full">Create Account</button>
             </form>
