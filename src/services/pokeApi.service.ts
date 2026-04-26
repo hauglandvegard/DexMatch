@@ -37,6 +37,7 @@
 import Pokedex from "pokedex-promise-v2";
 
 import { PokeStats, CleanSpeciesData } from "../types/pokemon.types";
+import { PokeType } from "../types/pokeTypes";
 import logger from "../utils/logger";
 
 const P = new Pokedex({
@@ -86,6 +87,20 @@ export function fetchRegionById(regionId: number) {
         () => P.getRegionByName(regionId),
         `Failed to fetch region ${regionId}`,
     );
+}
+
+export async function fetchTypeList(): Promise<PokeType[]> {
+    const result = await safeFetch(
+        () => P.getTypesList({ limit: 20 }),
+        'Failed to fetch type list',
+    );
+    if (!result) return [];
+    return (result as any).results
+        .map((t: { name: string; url: string }) => {
+            const id = parseInt(t.url.split('/').filter(Boolean).pop() ?? '0', 10);
+            return { id, name: t.name };
+        })
+        .filter((t: PokeType) => t.id >= 1 && t.id <= 18);
 }
 
 const STAT_KEY_MAP: Record<string, keyof PokeStats> = {

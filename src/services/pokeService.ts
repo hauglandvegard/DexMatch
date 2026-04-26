@@ -1,7 +1,8 @@
-import { buildCleanSpeciesData } from './pokeApi.service';
+import { buildCleanSpeciesData, fetchTypeList } from './pokeApi.service';
 import getJokeForType from './CNService';
 import generatePokemon from './pokeGenerator';
-import { insertPokemon, getUnswipedPokemon, getPokemonCount, getLikedPokemon } from '../models/Pokemon';
+import { insertPokemon, getUnswipedPokemon, getAllUnswipedPokemon, getPokemonCount, getLikedPokemon } from '../models/Pokemon';
+import { getWantedTypeIds } from '../models/User';
 import { Pokemon } from '../types/pokemon.types';
 import logger from '../utils/logger';
 
@@ -37,16 +38,40 @@ export async function seedPool(targetSize: number = POOL_SIZE): Promise<void> {
     logger.info(`Pool seeded`, { added: needed });
 }
 
+async function pickWithTypeFilter(userId: number): Promise<Pokemon | undefined> {
+    const wantedIds = getWantedTypeIds(userId);
+    if (wantedIds.length === 0) return getUnswipedPokemon(userId);
+
+    const typeList = await fetchTypeList();
+    const idToName = new Map(typeList.map((t) => [t.id, t.name]));
+    const wantedNames = new Set(wantedIds.map((id) => idToName.get(id)).filter(Boolean));
+
+    const candidates = getAllUnswipedPokemon(userId);
+    if (candidates.length === 0) return undefined;
+
+    const speciesResults = await Promise.all(
+        candidates.map((p) => buildCleanSpeciesData(p.speciesId))
+    );
+
+    const matching = candidates.filter((_, i) => {
+        const data = speciesResults[i];
+        return data?.types.some((t) => wantedNames.has(t));
+    });
+
+    const pool = matching.length > 0 ? matching : candidates;
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
 export async function getNextPokemon(userId: number): Promise<PokemonProfile> {
     if (getPokemonCount() < POOL_LOW_THRESHOLD) {
         await seedPool();
     }
 
-    let pokemon = getUnswipedPokemon(userId);
+    let pokemon = await pickWithTypeFilter(userId);
 
     if (!pokemon) {
         await seedPool(getPokemonCount() + POOL_SIZE);
-        pokemon = getUnswipedPokemon(userId);
+        pokemon = await pickWithTypeFilter(userId);
         if (!pokemon) throw new Error('No pokemon available');
     }
 
