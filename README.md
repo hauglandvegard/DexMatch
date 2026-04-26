@@ -1,5 +1,8 @@
-# DexMatch
-A dating app for Pokémon to find their true mate.
+![DexMatch](public/images/logo.svg)
+
+Gives sliding into your DM's a whole new meaning
+
+Check it out --> https://www.dexmatch.no
 
 ### Overview
 
