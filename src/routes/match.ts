@@ -9,11 +9,12 @@ const router = Router();
 
 router.get('/swipe', requireAuth, async (req, res) => {
     res.setHeader('Cache-Control', 'no-store');
+    const userId = req.session.userId!;
     try {
-        res.locals.profile = await getNextPokemon();
+        res.locals.profile = await getNextPokemon(userId);
         res.render('swipe');
     } catch (error) {
-        logger.error('Failed to generate pokemon profile', error);
+        logger.error('Failed to load pokemon profile', error);
         res.status(500).send('Failed to load a Pokémon. Please try again.');
     }
 });
