@@ -8,9 +8,10 @@ import logger from '../utils/logger';
 const router = Router();
 
 router.get('/swipe', requireAuth, async (req, res) => {
+    res.setHeader('Cache-Control', 'no-store');
     try {
-        const profile = await getNextPokemon();
-        res.render('swipe', { profile });
+        res.locals.profile = await getNextPokemon();
+        res.render('swipe');
     } catch (error) {
         logger.error('Failed to generate pokemon profile', error);
         res.status(500).send('Failed to load a Pokémon. Please try again.');
@@ -22,8 +23,12 @@ router.post('/swipe', requireAuth, (req, res) => {
     const pokemonId = Number(req.body.pokemonId);
     const isLiked = req.body.liked === 'true';
 
-    createSwipe(userId, pokemonId, isLiked);
-    logger.debug('Swipe recorded', { userId, pokemonId, isLiked });
+    try {
+        createSwipe(userId, pokemonId, isLiked);
+        logger.debug('Swipe recorded', { userId, pokemonId, isLiked });
+    } catch (error) {
+        logger.error('Failed to record swipe', { userId, pokemonId, error });
+    }
     res.redirect('/swipe');
 });
 
