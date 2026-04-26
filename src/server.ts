@@ -1,6 +1,4 @@
-import { initDB } from "./database";
-
-initDB();
+import "./database";
 
 import { app } from "./app";
 import { seedPool } from "./services/pokeService";
