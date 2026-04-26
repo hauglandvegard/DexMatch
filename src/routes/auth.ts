@@ -2,24 +2,27 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 
 import { createUser, getUserByUsername } from '../models/User';
+import { loginSchema, registerSchema } from '../schemas/auth.schema';
 
 const router = Router();
 
 router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.render('login', { error: 'Username and password required.' });
+    const result = loginSchema.safeParse(req.body);
+    if (!result.success) {
+        const error = result.error.issues[0].message;
+        return res.render('login', { error, activeTab: 'login' });
     }
 
-    const user = getUserByUsername(String(username));
+    const { username, password } = result.data;
+
+    const user = getUserByUsername(username);
     if (!user) {
-        return res.render('login', { error: 'Invalid username or password.' });
+        return res.render('login', { error: 'Invalid username or password.', activeTab: 'login' });
     }
 
-    const valid = await bcrypt.compare(String(password), user.passwordHash);
+    const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) {
-        return res.render('login', { error: 'Invalid username or password.' });
+        return res.render('login', { error: 'Invalid username or password.', activeTab: 'login' });
     }
 
     req.session.userId = user.id;
@@ -27,20 +30,21 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/register', async (req, res) => {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.render('login', { error: 'Username and password required.' });
+    const result = registerSchema.safeParse(req.body);
+    if (!result.success) {
+        const error = result.error.issues[0].message;
+        return res.render('login', { error, activeTab: 'register' });
     }
 
-    const passwordHash = await bcrypt.hash(String(password), 12);
+    const { username, password } = result.data;
+    const passwordHash = await bcrypt.hash(password, 12);
 
     try {
-        const userId = createUser(String(username), passwordHash);
+        const userId = createUser(username, passwordHash);
         req.session.userId = userId;
         res.redirect('/swipe');
     } catch (error: any) {
-        res.render('login', { error: error.message });
+        res.render('login', { error: error.message, activeTab: 'register' });
     }
 });
 
