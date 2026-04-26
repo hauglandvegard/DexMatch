@@ -35,31 +35,20 @@
 
             <div class="divider"></div>
 
-            <div class="grid grid-cols-3 gap-1 text-xs text-center mb-2">
+            <div class="grid grid-cols-3 gap-1 text-center mb-2">
+                <% [
+                    ['HP',     profile.pokemon.statsIV.hp],
+                    ['ATK',    profile.pokemon.statsIV.atk],
+                    ['DEF',    profile.pokemon.statsIV.def],
+                    ['SP.ATK', profile.pokemon.statsIV.spAtk],
+                    ['SP.DEF', profile.pokemon.statsIV.spDef],
+                    ['SPD',    profile.pokemon.statsIV.speed],
+                ].forEach(([label, val]) => { %>
                 <div class="stat p-1">
-                    <div class="stat-title text-xs">HP</div>
-                    <div class="stat-value text-sm"><%= profile.pokemon.statsIV.hp %></div>
+                    <div class="stat-label"><%= label %></div>
+                    <div class="stat-val"><%= val %></div>
                 </div>
-                <div class="stat p-1">
-                    <div class="stat-title text-xs">ATK</div>
-                    <div class="stat-value text-sm"><%= profile.pokemon.statsIV.atk %></div>
-                </div>
-                <div class="stat p-1">
-                    <div class="stat-title text-xs">DEF</div>
-                    <div class="stat-value text-sm"><%= profile.pokemon.statsIV.def %></div>
-                </div>
-                <div class="stat p-1">
-                    <div class="stat-title text-xs">SP.ATK</div>
-                    <div class="stat-value text-sm"><%= profile.pokemon.statsIV.spAtk %></div>
-                </div>
-                <div class="stat p-1">
-                    <div class="stat-title text-xs">SP.DEF</div>
-                    <div class="stat-value text-sm"><%= profile.pokemon.statsIV.spDef %></div>
-                </div>
-                <div class="stat p-1">
-                    <div class="stat-title text-xs">SPD</div>
-                    <div class="stat-value text-sm"><%= profile.pokemon.statsIV.speed %></div>
-                </div>
+                <% }); %>
             </div>
 
             <div class="card-actions justify-between mt-2">
