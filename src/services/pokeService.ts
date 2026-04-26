@@ -1,4 +1,4 @@
-import { buildCleanSpeciesData, fetchTypeList, fetchRegionSpeciesIds } from './pokeApi.service';
+import { buildCleanSpeciesData, fetchTypeList, fetchRegionSpeciesIds, fetchSpeciesIdsByTypes } from './pokeApi.service';
 import getJokeForType from './CNService';
 import generatePokemon from './pokeGenerator';
 import { insertPokemon, getUnswipedPokemon, getAllUnswipedPokemon, getPokemonCount, getLikedPokemon } from '../models/Pokemon';
@@ -8,7 +8,7 @@ import logger from '../utils/logger';
 
 const MAX_SPECIES_ID = 898;
 const POOL_SIZE = 50;
-const POOL_LOW_THRESHOLD = 10;
+const POOL_LOW_THRESHOLD = 5;
 
 export interface PokemonProfile {
     pokemon: Pokemon;
@@ -17,8 +17,29 @@ export interface PokemonProfile {
     shinySpriteUrl: string;
 }
 
-async function generateAndInsert(): Promise<void> {
-    const speciesId = Math.floor(Math.random() * MAX_SPECIES_ID) + 1;
+async function buildCandidateIds(wantedTypeIds: number[], regionId: number | null): Promise<number[]> {
+    const [typeList, regionIds] = await Promise.all([
+        wantedTypeIds.length > 0 ? fetchTypeList() : Promise.resolve([]),
+        regionId && regionId > 0 ? fetchRegionSpeciesIds(regionId) : Promise.resolve(new Set<number>()),
+    ]);
+
+    const idToName = new Map(typeList.map((t) => [t.id, t.name]));
+    const wantedNames = wantedTypeIds.map((id) => idToName.get(id)).filter((n): n is string => Boolean(n));
+    const typeIds = wantedNames.length > 0 ? await fetchSpeciesIdsByTypes(wantedNames) : new Set<number>();
+
+    if (typeIds.size === 0 && regionIds.size === 0) return [];
+    if (typeIds.size === 0) return Array.from(regionIds);
+    if (regionIds.size === 0) return Array.from(typeIds);
+    return Array.from(typeIds).filter((id) => regionIds.has(id));
+}
+
+async function generateAndInsert(candidateIds?: number[]): Promise<void> {
+    let speciesId: number;
+    if (candidateIds && candidateIds.length > 0) {
+        speciesId = candidateIds[Math.floor(Math.random() * candidateIds.length)];
+    } else {
+        speciesId = Math.floor(Math.random() * MAX_SPECIES_ID) + 1;
+    }
     const speciesData = await buildCleanSpeciesData(speciesId);
     if (!speciesData) return;
     const primaryType = speciesData.types[0] ?? 'normal';
@@ -27,15 +48,26 @@ async function generateAndInsert(): Promise<void> {
     insertPokemon(draft);
 }
 
-export async function seedPool(targetSize: number = POOL_SIZE): Promise<void> {
+export async function seedPool(targetSize: number = POOL_SIZE, userId?: number): Promise<void> {
     const current = getPokemonCount();
     const needed = Math.max(0, targetSize - current);
     if (needed === 0) return;
-    logger.info(`Seeding pokemon pool`, { needed, current, target: targetSize });
-    for (let i = 0; i < needed; i++) {
-        await generateAndInsert();
+
+    let candidateIds: number[] | undefined;
+    if (userId !== undefined) {
+        const wantedTypeIds = getWantedTypeIds(userId);
+        const regionId = getUserById(userId)?.regionIdPref ?? null;
+        if (wantedTypeIds.length > 0 || (regionId !== null && regionId > 0)) {
+            const ids = await buildCandidateIds(wantedTypeIds, regionId);
+            if (ids.length > 0) candidateIds = ids;
+        }
     }
-    logger.info(`Pool seeded`, { added: needed });
+
+    logger.info('Seeding pokemon pool', { needed, current, target: targetSize, constrained: !!candidateIds });
+    for (let i = 0; i < needed; i++) {
+        await generateAndInsert(candidateIds);
+    }
+    logger.info('Pool seeded', { added: needed });
 }
 
 async function pickNextCandidate(userId: number): Promise<Pokemon | undefined> {
@@ -66,20 +98,33 @@ async function pickNextCandidate(userId: number): Promise<Pokemon | undefined> {
         return typeOk && regionOk;
     });
 
-    const pool = matching.length > 0 ? matching : candidates;
-    return pool[Math.floor(Math.random() * pool.length)];
+    if (matching.length === 0) return undefined;
+    return matching[Math.floor(Math.random() * matching.length)];
+}
+
+function seedInBackground(targetSize: number, userId: number): void {
+    if (process.env.NODE_ENV === 'test') return;
+    seedPool(targetSize, userId).catch((err) => logger.error('Background pool seeding failed', err));
 }
 
 export async function getNextPokemon(userId: number): Promise<PokemonProfile> {
-    if (getPokemonCount() < POOL_LOW_THRESHOLD) {
-        await seedPool();
+    const unswipedCount = getAllUnswipedPokemon(userId).length;
+    if (unswipedCount <= POOL_LOW_THRESHOLD) {
+        seedInBackground(getPokemonCount() + POOL_SIZE, userId);
     }
 
     let pokemon = await pickNextCandidate(userId);
 
     if (!pokemon) {
-        await seedPool(getPokemonCount() + POOL_SIZE);
-        pokemon = await pickNextCandidate(userId);
+        // No matching candidates — seed more for future swipes, show any unswiped now
+        seedInBackground(getPokemonCount() + POOL_SIZE, userId);
+        pokemon = getUnswipedPokemon(userId);
+    }
+
+    if (!pokemon) {
+        // Truly empty pool — must block on first seed
+        await seedPool(POOL_SIZE, userId);
+        pokemon = getUnswipedPokemon(userId);
         if (!pokemon) throw new Error('No pokemon available');
     }
 

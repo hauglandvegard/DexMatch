@@ -1,5 +1,5 @@
 import Pokedex from 'pokedex-promise-v2';
-import { buildCleanSpeciesData, fetchRegionSpeciesIds } from '../../src/services/pokeApi.service';
+import { buildCleanSpeciesData, fetchRegionSpeciesIds, fetchSpeciesIdsByTypes } from '../../src/services/pokeApi.service';
 
 // pokeApi.service creates `const P = new Pokedex(...)` at module load.
 // Get that instance from the mock constructor's call record.
@@ -176,5 +176,64 @@ describe('fetchRegionSpeciesIds', () => {
 
         const ids = await fetchRegionSpeciesIds(1);
         expect(ids).toEqual(new Set([2, 3]));
+    });
+});
+
+describe('fetchSpeciesIdsByTypes', () => {
+    let mockInstance: ReturnType<typeof getMockInstance>;
+
+    const mockFireType = {
+        pokemon: [
+            { pokemon: { url: 'https://pokeapi.co/api/v2/pokemon/4/' } },
+            { pokemon: { url: 'https://pokeapi.co/api/v2/pokemon/5/' } },
+        ],
+    };
+    const mockWaterType = {
+        pokemon: [
+            { pokemon: { url: 'https://pokeapi.co/api/v2/pokemon/7/' } },
+            { pokemon: { url: 'https://pokeapi.co/api/v2/pokemon/4/' } },
+        ],
+    };
+
+    beforeEach(() => {
+        mockInstance = getMockInstance();
+        mockInstance.getTypeByName.mockReset();
+    });
+
+    it('returns species IDs for a single type', async () => {
+        mockInstance.getTypeByName.mockResolvedValue(mockFireType);
+        const ids = await fetchSpeciesIdsByTypes(['fire']);
+        expect(ids).toEqual(new Set([4, 5]));
+    });
+
+    it('merges and deduplicates IDs across multiple types', async () => {
+        mockInstance.getTypeByName
+            .mockResolvedValueOnce(mockFireType)
+            .mockResolvedValueOnce(mockWaterType);
+        const ids = await fetchSpeciesIdsByTypes(['fire', 'water']);
+        expect(ids).toEqual(new Set([4, 5, 7]));
+    });
+
+    it('filters out IDs above 898', async () => {
+        mockInstance.getTypeByName.mockResolvedValue({
+            pokemon: [
+                { pokemon: { url: 'https://pokeapi.co/api/v2/pokemon/4/' } },
+                { pokemon: { url: 'https://pokeapi.co/api/v2/pokemon/10000/' } },
+            ],
+        });
+        const ids = await fetchSpeciesIdsByTypes(['fire']);
+        expect(ids).toEqual(new Set([4]));
+    });
+
+    it('returns empty set when type fetch fails', async () => {
+        mockInstance.getTypeByName.mockRejectedValue(new Error('network error'));
+        const ids = await fetchSpeciesIdsByTypes(['fire']);
+        expect(ids.size).toBe(0);
+    });
+
+    it('returns empty set for empty input', async () => {
+        const ids = await fetchSpeciesIdsByTypes([]);
+        expect(ids.size).toBe(0);
+        expect(mockInstance.getTypeByName).not.toHaveBeenCalled();
     });
 });
