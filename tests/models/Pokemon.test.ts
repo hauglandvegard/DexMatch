@@ -1,4 +1,6 @@
-import { insertPokemon, getPokemonById } from "../../src/models/Pokemon";
+import { insertPokemon, getPokemonById, getLikedPokemon } from "../../src/models/Pokemon";
+import { createUser } from "../../src/models/User";
+import { createSwipe } from "../../src/models/Swipe";
 import db from "../../src/database";
 import { Gender, DraftPokemon } from "../../src/types/pokemon.types";
 
@@ -70,6 +72,42 @@ describe("Pokemon Model Tests", () => {
         it("should return undefined for a non-existent id", () => {
             const pokemon = getPokemonById(-1);
             expect(pokemon).toBeUndefined();
+        });
+    });
+
+    describe("getLikedPokemon", () => {
+        let likedUserId: number;
+        let likedPokemonId: number;
+        let dislikedPokemonId: number;
+
+        beforeAll(() => {
+            likedUserId = createUser(`liked_test_${Date.now()}`, "hashed_password");
+
+            const liked = insertPokemon({ ...mockPokemonData, name: "LikedMon", speciesId: 10 });
+            likedPokemonId = liked.id;
+
+            const disliked = insertPokemon({ ...mockPokemonData, name: "DislikedMon", speciesId: 11 });
+            dislikedPokemonId = disliked.id;
+
+            createSwipe(likedUserId, likedPokemonId, true);
+            createSwipe(likedUserId, dislikedPokemonId, false);
+        });
+
+        afterAll(() => {
+            db.prepare("DELETE FROM USERS WHERE id = ?").run(likedUserId);
+            db.prepare("DELETE FROM POKEMON WHERE id IN (?, ?)").run(likedPokemonId, dislikedPokemonId);
+        });
+
+        it("should return only liked pokemon for the user", () => {
+            const results = getLikedPokemon(likedUserId);
+            expect(results).toHaveLength(1);
+            expect(results[0].id).toBe(likedPokemonId);
+            expect(results[0].name).toBe("LikedMon");
+        });
+
+        it("should return empty array when user has no liked pokemon", () => {
+            const results = getLikedPokemon(-1);
+            expect(results).toEqual([]);
         });
     });
 });
