@@ -30,5 +30,6 @@ jobs:
                   key: ${{ secrets.SSH_PRIVATE_KEY }}
                   port: ${{ secrets.REMOTE_PORT }}
                   script: |
+                      set -e
                       cd /var/www/dex-match
                       ./deploy.sh
