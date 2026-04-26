@@ -7,6 +7,7 @@ import morgan from 'morgan';
 import helmet from 'helmet';
 
 import logger from './utils/logger';
+import { getUserById } from './models/User';
 import authRouter from './routes/auth';
 import matchRouter from './routes/match';
 
@@ -23,7 +24,17 @@ app.set('view engine', 'ejs');
 app.use(expressLayouts);
 app.set('layout', 'layout');
 
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", 'cdn.tailwindcss.com', "'unsafe-inline'"],
+            styleSrc: ["'self'", 'cdn.jsdelivr.net', "'unsafe-inline'"],
+            imgSrc: ["'self'", 'raw.githubusercontent.com', 'data:'],
+            connectSrc: ["'self'", 'ws:', 'https://cdn.jsdelivr.net'],
+        },
+    },
+}));
 
 app.use(morgan('dev', {
     stream: { write: (message: string) => logger.info(message.trim()) }
@@ -40,9 +51,18 @@ app.use(session({
     cookie: { secure: isProd }
 }));
 
+app.use((req, res, next) => {
+    if (req.session.userId) {
+        res.locals.currentUser = getUserById(req.session.userId);
+    }
+    res.locals.error = null;
+    res.locals.activeTab = 'login';
+    next();
+});
+
 app.get('/', (req, res) => {
     if (req.session.userId) return res.redirect('/swipe');
-    res.render('login', { error: null, activeTab: 'login' });
+    res.render('login');
 });
 
 app.use(authRouter);

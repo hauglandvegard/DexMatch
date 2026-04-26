@@ -10,8 +10,8 @@
     <% } %>
 
     <div class="tabs tabs-boxed mb-6 w-full justify-center">
-        <a class="tab <%= activeTab === 'login' ? 'tab-active' : '' %>" onclick="showTab('login')">Login</a>
-        <a class="tab <%= activeTab === 'register' ? 'tab-active' : '' %>" onclick="showTab('register')">Register</a>
+        <a class="tab <%= activeTab === 'login' ? 'tab-active' : '' %>" data-tab="login">Login</a>
+        <a class="tab <%= activeTab === 'register' ? 'tab-active' : '' %>" data-tab="register">Register</a>
     </div>
 
     <div id="login-form" class="card bg-base-100 shadow-xl w-full <%= activeTab === 'login' ? '' : 'hidden' %>">
@@ -38,6 +38,10 @@
                     <input type="text" name="username" class="input input-bordered" placeholder="ash_ketchum" required />
                     <label class="label"><span class="label-text-alt text-base-content/50">3–20 chars, letters/numbers/underscores</span></label>
                 </div>
+                <div class="form-control mb-4">
+                    <label class="label"><span class="label-text">Display Name <span class="text-base-content/40">(optional)</span></span></label>
+                    <input type="text" name="displayName" class="input input-bordered" placeholder="Ash Ketchum" maxlength="30" />
+                </div>
                 <div class="form-control mb-6">
                     <label class="label"><span class="label-text">Password</span></label>
                     <input type="password" name="password" class="input input-bordered" placeholder="••••••••" required />
@@ -50,12 +54,13 @@
 </div>
 
 <script>
-    function showTab(tab) {
-        const tabs = document.querySelectorAll('.tab');
-        tabs.forEach(t => t.classList.remove('tab-active'));
-        event.target.classList.add('tab-active');
-        document.getElementById('login-form').classList.add('hidden');
-        document.getElementById('register-form').classList.add('hidden');
-        document.getElementById(tab + '-form').classList.remove('hidden');
-    }
+    document.querySelectorAll('.tab[data-tab]').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('tab-active'); });
+            this.classList.add('tab-active');
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById(this.dataset.tab + '-form').classList.remove('hidden');
+        });
+    });
 </script>
