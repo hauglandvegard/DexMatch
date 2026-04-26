@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 
 import { createUser, getUserByUsername } from '../models/User';
 import { loginSchema, registerSchema } from '../schemas/auth.schema';
+import logger from '../utils/logger';
 
 const router = Router();
 
@@ -22,6 +23,7 @@ router.post('/login', async (req, res) => {
 
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) {
+        logger.warn('Failed login attempt', { username });
         return res.render('login', { error: 'Invalid username or password.', activeTab: 'login' });
     }
 
@@ -42,6 +44,7 @@ router.post('/register', async (req, res) => {
     try {
         const userId = createUser(username, passwordHash);
         req.session.userId = userId;
+        logger.info('New user registered', { username, userId });
         res.redirect('/swipe');
     } catch (error: any) {
         res.render('login', { error: error.message, activeTab: 'register' });

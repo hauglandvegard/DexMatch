@@ -23,6 +23,7 @@ router.post('/swipe', requireAuth, (req, res) => {
     const isLiked = req.body.liked === 'true';
 
     createSwipe(userId, pokemonId, isLiked);
+    logger.debug('Swipe recorded', { userId, pokemonId, isLiked });
     res.redirect('/swipe');
 });
 
