@@ -1,9 +1,59 @@
-<%#
-    This is the first thing a user sees. It contains a HTML form asking for login name.
+<%# Login / Register page %>
+<div class="flex flex-col items-center mt-16 w-full max-w-sm">
+    <h1 class="text-4xl font-bold text-primary mb-2">DexMatch</h1>
+    <p class="text-base-content/60 mb-8">Find your Pokémon soulmate</p>
 
-    When "Submit" is clicked it sends a POST request to routs.js to log the user in or create a new account.
-%>
-<div class="text-center mt-20">
-    <h1 class="text-4xl font-bold text-primary">Welcome to DexMatch</h1>
-    <p class="mt-4 text-lg">This is the login screen</p>
+    <% if (error) { %>
+        <div class="alert alert-error mb-4 w-full">
+            <span><%= error %></span>
+        </div>
+    <% } %>
+
+    <div class="tabs tabs-boxed mb-6 w-full justify-center" id="auth-tabs">
+        <a class="tab tab-active" onclick="showTab('login')">Login</a>
+        <a class="tab" onclick="showTab('register')">Register</a>
+    </div>
+
+    <div id="login-form" class="card bg-base-100 shadow-xl w-full">
+        <div class="card-body">
+            <form method="POST" action="/login">
+                <div class="form-control mb-4">
+                    <label class="label"><span class="label-text">Username</span></label>
+                    <input type="text" name="username" class="input input-bordered" placeholder="ash_ketchum" required />
+                </div>
+                <div class="form-control mb-6">
+                    <label class="label"><span class="label-text">Password</span></label>
+                    <input type="password" name="password" class="input input-bordered" placeholder="••••••••" required />
+                </div>
+                <button class="btn btn-primary w-full">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="register-form" class="card bg-base-100 shadow-xl w-full hidden">
+        <div class="card-body">
+            <form method="POST" action="/register">
+                <div class="form-control mb-4">
+                    <label class="label"><span class="label-text">Username</span></label>
+                    <input type="text" name="username" class="input input-bordered" placeholder="ash_ketchum" required />
+                </div>
+                <div class="form-control mb-6">
+                    <label class="label"><span class="label-text">Password</span></label>
+                    <input type="password" name="password" class="input input-bordered" placeholder="••••••••" required />
+                </div>
+                <button class="btn btn-primary w-full">Create Account</button>
+            </form>
+        </div>
+    </div>
 </div>
+
+<script>
+    function showTab(tab) {
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(t => t.classList.remove('tab-active'));
+        event.target.classList.add('tab-active');
+        document.getElementById('login-form').classList.add('hidden');
+        document.getElementById('register-form').classList.add('hidden');
+        document.getElementById(tab + '-form').classList.remove('hidden');
+    }
+</script>
