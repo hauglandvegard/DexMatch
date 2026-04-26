@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DexMatch</title>
 
+    <link rel="icon" href="/icon_dexmatch_color.svg" type="image/svg+xml">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -17,11 +18,14 @@
 <body class="bg-base-200 min-h-screen">
     <div class="navbar bg-base-100 shadow-xl mb-8 rounded-box w-11/12 mx-auto mt-4">
         <div class="flex-1">
-            <a href="/" class="btn btn-ghost text-xl">DexMatch</a>
+            <a href="/" class="btn btn-ghost gap-2">
+                <img src="/icon_dexmatch_negative_dark_mode.svg" alt="" class="h-7 w-7" />
+                <span class="text-xs font-pokemon leading-tight text-left text-[var(--color-pokemon-yellow)] pb-1">Dex<br/>Match</span>
+            </a>
         </div>
         <% if (locals.currentUser) { %>
         <div class="flex-none gap-3 items-center pr-2">
-            <span class="text-sm text-base-content/70">
+            <span class="text-xs font-pokemon text-base-content/70 capitalize">
                 <%= currentUser.displayName || currentUser.username %>
             </span>
             <form method="POST" action="/logout">
