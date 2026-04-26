@@ -1,0 +1,34 @@
+:root {
+    --color-pokemon-yellow: #ffcb05;
+    --color-pokemon-blue:   #2a75bb;
+    --color-pokemon-red:    #e62425;
+    --color-pokemon-dark:   #172027;
+}
+
+.font-pokemon {
+    font-family: 'PokemonClassic', sans-serif;
+}
+
+[data-theme="dark"] {
+    --p: 0.88 0.19 95;
+    --pf: 0.78 0.19 95;
+    --pc: 0.15 0.05 95;
+}
+
+@font-face {
+    font-family: 'PokemonClassic';
+    src: url('/fonts/Pokemon Classic.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'PokemonHollow';
+    src: url('/fonts/Pokemon Hollow.ttf') format('truetype');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'PokemonSolid';
+    src: url('/fonts/Pokemon Solid.ttf') format('truetype');
+    font-display: swap;
+}
