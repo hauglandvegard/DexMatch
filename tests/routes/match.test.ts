@@ -89,10 +89,10 @@ describe('GET /swipe', () => {
         expect(res.status).toBe(200);
     });
 
-    it('calls getNextPokemon when authenticated', async () => {
+    it('calls getNextPokemon with userId when authenticated', async () => {
         const agent = await loginAgent();
         await agent.get('/swipe');
-        expect(mockGetNextPokemon).toHaveBeenCalledTimes(1);
+        expect(mockGetNextPokemon).toHaveBeenCalledWith(TEST_USER_ID);
     });
 
     it('returns 500 when getNextPokemon throws', async () => {

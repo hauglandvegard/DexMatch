@@ -42,6 +42,15 @@ const insertStmt = db.prepare(`
 
 const selectByIdStmt = db.prepare("SELECT * FROM POKEMON WHERE id = ?");
 
+const selectUnswipedStmt = db.prepare(`
+    SELECT * FROM POKEMON
+    WHERE id NOT IN (SELECT pokemon_id FROM SWIPES WHERE user_id = ?)
+    ORDER BY RANDOM()
+    LIMIT 1
+`);
+
+const countStmt = db.prepare("SELECT COUNT(*) as count FROM POKEMON");
+
 /**
  * Insert Pokemon → DB.
  * @param draftPokemon - The draft pokemon data.
@@ -73,12 +82,17 @@ export function insertPokemon(draftPokemon: DraftPokemon): Pokemon {
     };
 }
 
-/**
- * Get Pokemon by ID.
- * @param id - Pokemon ID.
- * @returns Pokemon object if found.
- */
 export function getPokemonById(id: number): Pokemon | undefined {
     const row = selectByIdStmt.get(id) as PokemonRow | undefined;
     return row ? mapPokemon(row) : undefined;
+}
+
+export function getUnswipedPokemon(userId: number): Pokemon | undefined {
+    const row = selectUnswipedStmt.get(userId) as PokemonRow | undefined;
+    return row ? mapPokemon(row) : undefined;
+}
+
+export function getPokemonCount(): number {
+    const row = countStmt.get() as { count: number };
+    return row.count;
 }
