@@ -16,7 +16,7 @@ function mapSwipe(row: SwipeRow): Swipe {
 }
 
 const insertSwipeStmt = db.prepare(
-    "INSERT INTO SWIPES (user_id, pokemon_id, is_liked) VALUES (?, ?, ?)",
+    "INSERT OR IGNORE INTO SWIPES (user_id, pokemon_id, is_liked) VALUES (?, ?, ?)",
 );
 
 const selectByUserIdStmt = db.prepare("SELECT * FROM SWIPES WHERE user_id = ?");
