@@ -2,14 +2,18 @@ import path from 'path';
 
 import express from 'express';
 import session from 'express-session';
+import SqliteStoreFactory from 'better-sqlite3-session-store';
 import expressLayouts from 'express-ejs-layouts';
 import morgan from 'morgan';
 import helmet from 'helmet';
 
+import db from './database';
 import logger from './utils/logger';
 import { getUserById } from './models/User';
 import authRouter from './routes/auth';
 import matchRouter from './routes/match';
+
+const SqliteStore = SqliteStoreFactory(session);
 
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -46,11 +50,19 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
+const isTest = process.env.NODE_ENV === 'test';
+
 app.use(session({
     secret: process.env.SESSION_SECRET || 'dev_secret_change_in_production',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: 'auto' }
+    cookie: { secure: 'auto' },
+    ...(!isTest && {
+        store: new SqliteStore({
+            client: db,
+            expired: { clear: true, intervalMs: 15 * 60 * 1000 },
+        }),
+    }),
 }));
 
 app.use((req, res, next) => {
