@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
+import rateLimit from 'express-rate-limit';
 
 import { createUser, getUserByUsername } from '../models/User';
 import { loginSchema, registerSchema } from '../schemas/auth.schema';
@@ -8,7 +9,15 @@ import logger from '../utils/logger';
 
 const router = Router();
 
-router.post('/login', async (req, res) => {
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 20,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    message: 'Too many attempts. Try again in 15 minutes.',
+});
+
+router.post('/login', authLimiter, async (req, res) => {
     const result = loginSchema.safeParse(req.body);
     if (!result.success) {
         res.locals.error = result.error.issues[0].message;
@@ -37,7 +46,7 @@ router.post('/login', async (req, res) => {
     res.redirect('/swipe');
 });
 
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
     const result = registerSchema.safeParse(req.body);
     if (!result.success) {
         res.locals.error = result.error.issues[0].message;

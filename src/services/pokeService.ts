@@ -1,7 +1,7 @@
 import { buildCleanSpeciesData } from './pokeApi.service';
 import getJokeForType from './CNService';
 import generatePokemon from './pokeGenerator';
-import { insertPokemon, getUnswipedPokemon, getPokemonCount } from '../models/Pokemon';
+import { insertPokemon, getUnswipedPokemon, getPokemonCount, getLikedPokemon } from '../models/Pokemon';
 import { Pokemon } from '../types/pokemon.types';
 import logger from '../utils/logger';
 
@@ -53,10 +53,25 @@ export async function getNextPokemon(userId: number): Promise<PokemonProfile> {
     const speciesData = await buildCleanSpeciesData(pokemon.speciesId);
     if (!speciesData) throw new Error(`Failed to fetch data for species ${pokemon.speciesId}`);
 
+    return buildProfile(pokemon, speciesData.name);
+}
+
+function buildProfile(pokemon: Pokemon, speciesName: string): PokemonProfile {
     return {
         pokemon,
-        speciesName: speciesData.name,
+        speciesName,
         spriteUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.speciesId}.png`,
         shinySpriteUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.speciesId}.png`,
     };
+}
+
+export async function getLikedProfiles(userId: number): Promise<PokemonProfile[]> {
+    const liked = getLikedPokemon(userId);
+    const profiles = await Promise.all(
+        liked.map(async (pokemon) => {
+            const speciesData = await buildCleanSpeciesData(pokemon.speciesId);
+            return speciesData ? buildProfile(pokemon, speciesData.name) : null;
+        })
+    );
+    return profiles.filter((p): p is PokemonProfile => p !== null);
 }
