@@ -1,6 +1,6 @@
 {
     "name": "dexmatch",
-    "version": "0.9.4.2",
+    "version": "0.9.4.3",
     "description": "A dating app for Pokémon to find their true mate.",
     "main": "index.js",
     "scripts": {

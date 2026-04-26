@@ -1,0 +1,29 @@
+<%# Type preferences — user selects which Pokémon types they want to see %>
+<div class="w-full max-w-lg px-4">
+
+    <h1 class="text-3xl font-pokemon text-[var(--color-pokemon-yellow)] mb-2 text-center">Preferences</h1>
+    <p class="text-center text-base-content/60 text-sm mb-6">Choose types to see. Leave all unchecked to show every type.</p>
+
+    <form method="POST" action="/preferences">
+        <div class="grid grid-cols-3 gap-2 mb-6">
+            <% types.forEach(function(type) { %>
+                <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg border border-base-300 hover:border-[var(--color-pokemon-yellow)] transition-colors">
+                    <input
+                        type="checkbox"
+                        name="types"
+                        value="<%= type.id %>"
+                        class="checkbox checkbox-warning checkbox-sm"
+                        <%= wantedIds.has(type.id) ? 'checked' : '' %>
+                    />
+                    <span class="capitalize text-sm"><%= type.name %></span>
+                </label>
+            <% }); %>
+        </div>
+
+        <div class="flex gap-3 justify-center">
+            <button type="submit" class="btn btn-warning font-pokemon">Save</button>
+            <a href="/swipe" class="btn btn-ghost font-pokemon">Cancel</a>
+        </div>
+    </form>
+
+</div>
