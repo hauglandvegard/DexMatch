@@ -1,6 +1,6 @@
 {
     "name": "dexmatch",
-    "version": "0.3.5",
+    "version": "0.9.5.1",
     "description": "A dating app for Pokémon to find their true mate.",
     "main": "index.js",
     "scripts": {
@@ -28,6 +28,7 @@
         "axios": "^1.15.2",
         "bcryptjs": "^3.0.3",
         "better-sqlite3": "^12.9.0",
+        "better-sqlite3-session-store": "^0.1.0",
         "ejs": "^5.0.2",
         "express": "^5.2.1",
         "express-ejs-layouts": "^2.5.1",

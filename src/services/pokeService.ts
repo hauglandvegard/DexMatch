@@ -1,7 +1,8 @@
-import { buildCleanSpeciesData } from './pokeApi.service';
+import { buildCleanSpeciesData, fetchTypeList, fetchRegionSpeciesIds } from './pokeApi.service';
 import getJokeForType from './CNService';
 import generatePokemon from './pokeGenerator';
-import { insertPokemon, getUnswipedPokemon, getPokemonCount, getLikedPokemon } from '../models/Pokemon';
+import { insertPokemon, getUnswipedPokemon, getAllUnswipedPokemon, getPokemonCount, getLikedPokemon } from '../models/Pokemon';
+import { getWantedTypeIds, getUserById } from '../models/User';
 import { Pokemon } from '../types/pokemon.types';
 import logger from '../utils/logger';
 
@@ -37,16 +38,48 @@ export async function seedPool(targetSize: number = POOL_SIZE): Promise<void> {
     logger.info(`Pool seeded`, { added: needed });
 }
 
+async function pickNextCandidate(userId: number): Promise<Pokemon | undefined> {
+    const wantedTypeIds = getWantedTypeIds(userId);
+    const regionId = getUserById(userId)?.regionIdPref ?? null;
+    const hasFilters = wantedTypeIds.length > 0 || (regionId !== null && regionId > 0);
+
+    if (!hasFilters) return getUnswipedPokemon(userId);
+
+    const candidates = getAllUnswipedPokemon(userId);
+    if (candidates.length === 0) return undefined;
+
+    const [typeList, regionSpeciesIds] = await Promise.all([
+        wantedTypeIds.length > 0 ? fetchTypeList() : Promise.resolve([]),
+        regionId !== null ? fetchRegionSpeciesIds(regionId) : Promise.resolve(new Set<number>()),
+    ]);
+
+    const idToName = new Map(typeList.map((t) => [t.id, t.name]));
+    const wantedNames = new Set(wantedTypeIds.map((id) => idToName.get(id)).filter(Boolean));
+
+    const speciesResults = wantedTypeIds.length > 0
+        ? await Promise.all(candidates.map((p) => buildCleanSpeciesData(p.speciesId)))
+        : candidates.map(() => null);
+
+    const matching = candidates.filter((p, i) => {
+        const typeOk = wantedNames.size === 0 || speciesResults[i]?.types.some((t) => wantedNames.has(t));
+        const regionOk = regionSpeciesIds.size === 0 || regionSpeciesIds.has(p.speciesId);
+        return typeOk && regionOk;
+    });
+
+    const pool = matching.length > 0 ? matching : candidates;
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
 export async function getNextPokemon(userId: number): Promise<PokemonProfile> {
     if (getPokemonCount() < POOL_LOW_THRESHOLD) {
         await seedPool();
     }
 
-    let pokemon = getUnswipedPokemon(userId);
+    let pokemon = await pickNextCandidate(userId);
 
     if (!pokemon) {
         await seedPool(getPokemonCount() + POOL_SIZE);
-        pokemon = getUnswipedPokemon(userId);
+        pokemon = await pickNextCandidate(userId);
         if (!pokemon) throw new Error('No pokemon available');
     }
 

@@ -37,6 +37,7 @@
 import Pokedex from "pokedex-promise-v2";
 
 import { PokeStats, CleanSpeciesData } from "../types/pokemon.types";
+import { PokeType } from "../types/pokeTypes";
 import logger from "../utils/logger";
 
 const P = new Pokedex({
@@ -86,6 +87,48 @@ export function fetchRegionById(regionId: number) {
         () => P.getRegionByName(regionId),
         `Failed to fetch region ${regionId}`,
     );
+}
+
+function extractIdFromUrl(url: string): number {
+    const parts = url.split('/').filter(Boolean);
+    return parseInt(parts[parts.length - 1], 10);
+}
+
+export async function fetchRegionSpeciesIds(regionId: number): Promise<Set<number>> {
+    const region = await safeFetch(
+        () => P.getRegionByName(regionId),
+        `Failed to fetch region ${regionId}`,
+    ) as any;
+    if (!region?.pokedexes?.length) return new Set();
+
+    const pokedexes = await Promise.all(
+        region.pokedexes.map((pdx: { url: string }) =>
+            safeFetch(() => P.getResource(pdx.url), `Failed to fetch pokedex ${pdx.url}`)
+        )
+    ) as any[];
+
+    const ids = new Set<number>();
+    for (const pdx of pokedexes) {
+        if (!pdx?.pokemon_entries) continue;
+        for (const entry of pdx.pokemon_entries) {
+            ids.add(extractIdFromUrl(entry.pokemon_species.url));
+        }
+    }
+    return ids;
+}
+
+export async function fetchTypeList(): Promise<PokeType[]> {
+    const result = await safeFetch(
+        () => P.getTypesList({ limit: 20 }),
+        'Failed to fetch type list',
+    );
+    if (!result) return [];
+    return (result as any).results
+        .map((t: { name: string; url: string }) => {
+            const id = parseInt(t.url.split('/').filter(Boolean).pop() ?? '0', 10);
+            return { id, name: t.name };
+        })
+        .filter((t: PokeType) => t.id >= 1 && t.id <= 18);
 }
 
 const STAT_KEY_MAP: Record<string, keyof PokeStats> = {
