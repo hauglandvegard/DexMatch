@@ -81,6 +81,12 @@ describe("Swipe Model Tests", () => {
             const swipeId2 = createSwipe(testUserId, testPokemonId2, false);
             expect(swipeId2).toBeGreaterThan(0);
         });
+
+        it("should throw on duplicate swipe for the same user and pokemon", () => {
+            expect(() => {
+                createSwipe(testUserId, testPokemonId1, false);
+            }).toThrow();
+        });
     });
 
     describe("getSwipesByUserId", () => {
