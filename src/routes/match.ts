@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import { requireAuth } from '../middleware/auth';
-import { getNextPokemon } from '../services/pokeService';
+import { getNextPokemon, getLikedProfiles } from '../services/pokeService';
 import { createSwipe } from '../models/Swipe';
 import { getPokemonById } from '../models/Pokemon';
 import logger from '../utils/logger';
@@ -42,6 +42,17 @@ router.post('/swipe', requireAuth, (req, res) => {
         return res.status(500).send('Failed to record swipe. Please try again.');
     }
     res.redirect('/swipe');
+});
+
+router.get('/favorites', requireAuth, async (req, res) => {
+    const userId = req.session.userId!;
+    try {
+        res.locals.profiles = await getLikedProfiles(userId);
+        res.render('favorites');
+    } catch (error) {
+        logger.error('Failed to load favorites', error);
+        res.status(500).send('Failed to load favorites. Please try again.');
+    }
 });
 
 export default router;
