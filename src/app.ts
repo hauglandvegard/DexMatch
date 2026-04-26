@@ -19,6 +19,8 @@ if (isProd && !process.env.SESSION_SECRET) {
 
 const app = express();
 
+app.set('trust proxy', 1);
+
 app.set('views', path.join(__dirname, '../views'));
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
@@ -48,7 +50,7 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'dev_secret_change_in_production',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: isProd }
+    cookie: { secure: 'auto' }
 }));
 
 app.use((req, res, next) => {

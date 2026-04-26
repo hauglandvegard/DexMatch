@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "dev": "concurrently \"npm run start-server\" \"npm run start-sync\"",
-        "build": "tsc",
+        "build": "./node_modules/.bin/tsc -p tsconfig.build.json",
         "start": "node dist/server.js",
         "test": "jest --verbose",
         "start-server": "tsx watch src/server.ts",
