@@ -58,6 +58,11 @@ const selectLikedStmt = db.prepare(`
     ORDER BY s.created_at DESC
 `);
 
+const selectAllUnswipedStmt = db.prepare(`
+    SELECT * FROM POKEMON
+    WHERE id NOT IN (SELECT pokemon_id FROM SWIPES WHERE user_id = ?)
+`);
+
 /**
  * Insert Pokemon → DB.
  * @param draftPokemon - The draft pokemon data.
@@ -102,6 +107,11 @@ export function getUnswipedPokemon(userId: number): Pokemon | undefined {
 export function getPokemonCount(): number {
     const row = countStmt.get() as { count: number };
     return row.count;
+}
+
+export function getAllUnswipedPokemon(userId: number): Pokemon[] {
+    const rows = selectAllUnswipedStmt.all(userId) as PokemonRow[];
+    return rows.map(mapPokemon);
 }
 
 export function getLikedPokemon(userId: number): Pokemon[] {

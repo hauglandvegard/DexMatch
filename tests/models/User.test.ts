@@ -5,6 +5,7 @@ import {
     updateUserRegionPreference,
     updateUserThemePreference,
     setUserTypePreference,
+    getWantedTypeIds,
 } from "../../src/models/User";
 import db from "../../src/database";
 
@@ -91,6 +92,24 @@ describe("User Model Tests", () => {
 
             expect(row).toBeDefined();
             expect(row.is_wanted).toBe(0);
+        });
+    });
+
+    describe("getWantedTypeIds", () => {
+        it("should return only type IDs marked as wanted", () => {
+            setUserTypePreference(testUserId, 10, true);
+            setUserTypePreference(testUserId, 11, true);
+            setUserTypePreference(testUserId, 12, false);
+
+            const wanted = getWantedTypeIds(testUserId);
+            expect(wanted).toContain(10);
+            expect(wanted).toContain(11);
+            expect(wanted).not.toContain(12);
+        });
+
+        it("should return empty array for user with no wanted types", () => {
+            const wanted = getWantedTypeIds(-1);
+            expect(wanted).toEqual([]);
         });
     });
 

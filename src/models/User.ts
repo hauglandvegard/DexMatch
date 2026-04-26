@@ -42,6 +42,10 @@ const upsertTypePrefStmt = db.prepare(`
         is_wanted = excluded.is_wanted
 `);
 
+const selectWantedTypeIdsStmt = db.prepare(
+    "SELECT type_id FROM USER_TYPE_PREFS WHERE user_id = ? AND is_wanted = 1"
+);
+
 /**
  * Creates new user in DB.
  * @param username - Chosen username.
@@ -117,6 +121,11 @@ export function updateUserThemePreference(
  * @param typeId - ID of type.
  * @param isWanted - Whether user wants to see type or not.
  */
+export function getWantedTypeIds(userId: number): number[] {
+    const rows = selectWantedTypeIdsStmt.all(userId) as { type_id: number }[];
+    return rows.map((r) => r.type_id);
+}
+
 export function setUserTypePreference(
     userId: number,
     typeId: number,
