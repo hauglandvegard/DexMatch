@@ -6,14 +6,16 @@ jest.mock('../../src/models/Pokemon');
 import { buildCleanSpeciesData } from '../../src/services/pokeApi.service';
 import getJokeForType from '../../src/services/CNService';
 import generatePokemon from '../../src/services/pokeGenerator';
-import { insertPokemon } from '../../src/models/Pokemon';
-import { getNextPokemon } from '../../src/services/pokeService';
+import { insertPokemon, getUnswipedPokemon, getPokemonCount } from '../../src/models/Pokemon';
+import { getNextPokemon, seedPool } from '../../src/services/pokeService';
 import { Gender } from '../../src/types/pokemon.types';
 
 const mockBuildClean = buildCleanSpeciesData as jest.MockedFunction<typeof buildCleanSpeciesData>;
 const mockGetJoke = getJokeForType as jest.MockedFunction<typeof getJokeForType>;
 const mockGenerate = generatePokemon as jest.MockedFunction<typeof generatePokemon>;
 const mockInsert = insertPokemon as jest.MockedFunction<typeof insertPokemon>;
+const mockGetUnswiped = getUnswipedPokemon as jest.MockedFunction<typeof getUnswipedPokemon>;
+const mockGetCount = getPokemonCount as jest.MockedFunction<typeof getPokemonCount>;
 
 const mockSpeciesData = {
     id: 25,
@@ -48,59 +50,71 @@ beforeEach(() => {
     mockGetJoke.mockResolvedValue(mockDraft.description);
     mockGenerate.mockReturnValue(mockDraft);
     mockInsert.mockReturnValue(mockPokemon);
+    mockGetUnswiped.mockReturnValue(mockPokemon);
+    mockGetCount.mockReturnValue(50);
 });
 
 describe('getNextPokemon', () => {
-    it('returns profile with pokemon, speciesName, and sprite URLs', async () => {
-        const profile = await getNextPokemon();
+    it('returns profile with pokemon from pool', async () => {
+        const profile = await getNextPokemon(1);
         expect(profile.pokemon).toEqual(mockPokemon);
         expect(profile.speciesName).toBe('pikachu');
         expect(profile.spriteUrl).toMatch(/\.png$/);
         expect(profile.shinySpriteUrl).toMatch(/\.png$/);
     });
 
-    it('sprite URLs contain the resolved speciesId', async () => {
-        jest.spyOn(Math, 'random').mockReturnValue(0); // speciesId = 1
-        const profile = await getNextPokemon();
-        expect(profile.spriteUrl).toContain('/1.png');
-        expect(profile.shinySpriteUrl).toContain('/1.png');
+    it('sprite URLs use pokemon speciesId', async () => {
+        const profile = await getNextPokemon(1);
+        expect(profile.spriteUrl).toContain('/25.png');
+        expect(profile.shinySpriteUrl).toContain('/25.png');
     });
 
-    it('throws when buildCleanSpeciesData returns null', async () => {
+    it('calls getUnswipedPokemon with userId', async () => {
+        await getNextPokemon(7);
+        expect(mockGetUnswiped).toHaveBeenCalledWith(7);
+    });
+
+    it('seeds pool when count is below threshold', async () => {
+        mockGetCount.mockReturnValue(5);
+        mockGetUnswiped.mockReturnValueOnce(undefined).mockReturnValue(mockPokemon);
+        await getNextPokemon(1);
+        expect(mockInsert).toHaveBeenCalled();
+    });
+
+    it('generates more when no unswiped pokemon', async () => {
+        mockGetUnswiped.mockReturnValueOnce(undefined).mockReturnValue(mockPokemon);
+        await getNextPokemon(1);
+        expect(mockInsert).toHaveBeenCalled();
+    });
+
+    it('throws when no pokemon available after seeding', async () => {
+        mockGetUnswiped.mockReturnValue(undefined);
+        await expect(getNextPokemon(1)).rejects.toThrow('No pokemon available');
+    });
+
+    it('throws when buildCleanSpeciesData returns null for display', async () => {
         mockBuildClean.mockResolvedValue(null);
-        await expect(getNextPokemon()).rejects.toThrow();
+        await expect(getNextPokemon(1)).rejects.toThrow();
+    });
+});
+
+describe('seedPool', () => {
+    it('does not insert when pool already at target', async () => {
+        mockGetCount.mockReturnValue(50);
+        await seedPool(50);
+        expect(mockInsert).not.toHaveBeenCalled();
     });
 
-    it('passes primary type to getJokeForType', async () => {
-        await getNextPokemon();
-        expect(mockGetJoke).toHaveBeenCalledWith('electric');
+    it('inserts the needed number of pokemon', async () => {
+        mockGetCount.mockReturnValue(48);
+        await seedPool(50);
+        expect(mockInsert).toHaveBeenCalledTimes(2);
     });
 
-    it('falls back to "normal" when types array is empty', async () => {
-        mockBuildClean.mockResolvedValue({ ...mockSpeciesData, types: [] });
-        await getNextPokemon();
-        expect(mockGetJoke).toHaveBeenCalledWith('normal');
-    });
-
-    it('passes species data and joke to generatePokemon', async () => {
-        await getNextPokemon();
-        expect(mockGenerate).toHaveBeenCalledWith(mockSpeciesData, mockDraft.description);
-    });
-
-    it('inserts the generated draft into the database', async () => {
-        await getNextPokemon();
-        expect(mockInsert).toHaveBeenCalledWith(mockDraft);
-    });
-
-    it('calls buildCleanSpeciesData with speciesId = 1 when Math.random returns 0', async () => {
-        jest.spyOn(Math, 'random').mockReturnValue(0);
-        await getNextPokemon();
-        expect(mockBuildClean).toHaveBeenCalledWith(1);
-    });
-
-    it('calls buildCleanSpeciesData with speciesId = 898 when Math.random returns ~1', async () => {
-        jest.spyOn(Math, 'random').mockReturnValue(0.9999);
-        await getNextPokemon();
-        expect(mockBuildClean).toHaveBeenCalledWith(898);
+    it('skips insert when buildCleanSpeciesData returns null', async () => {
+        mockGetCount.mockReturnValue(49);
+        mockBuildClean.mockResolvedValue(null);
+        await seedPool(50);
+        expect(mockInsert).not.toHaveBeenCalled();
     });
 });
