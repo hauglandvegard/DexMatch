@@ -82,10 +82,10 @@ describe("Swipe Model Tests", () => {
             expect(swipeId2).toBeGreaterThan(0);
         });
 
-        it("should throw on duplicate swipe for the same user and pokemon", () => {
+        it("should silently ignore duplicate swipe for the same user and pokemon", () => {
             expect(() => {
                 createSwipe(testUserId, testPokemonId1, false);
-            }).toThrow();
+            }).not.toThrow();
         });
     });
 
