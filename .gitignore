@@ -141,6 +141,7 @@ vite.config.ts.timestamp-*
 # Other
 test.ts
 .deprecated
+assets
 
 # Database
 data/
