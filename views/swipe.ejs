@@ -1,14 +1,16 @@
 <%# Core swiping interface — displays one Pokémon profile at a time %>
 <div class="flex flex-col items-center w-full max-w-md">
 
-    <div class="card bg-base-100 shadow-xl w-full">
-        <figure class="px-10 pt-10">
-            <img
-                src="<%= profile.pokemon.isShiny ? profile.shinySpriteUrl : profile.spriteUrl %>"
-                alt="<%= profile.speciesName %>"
-                class="w-48 h-48 object-contain image-rendering-pixelated"
-                style="image-rendering: pixelated;"
-            />
+    <div class="card bg-base-100 shadow-xl w-full border-4 border-[var(--color-pokemon-yellow)]">
+        <figure class="pt-10 flex justify-center">
+            <div class="w-64 h-90 flex-shrink-0 border-4 border-[var(--color-pokemon-yellow)] rounded-xl flex items-center justify-center bg-base-200">
+                <img
+                    src="<%= profile.pokemon.isShiny ? profile.shinySpriteUrl : profile.spriteUrl %>"
+                    alt="<%= profile.speciesName %>"
+                    class="w-56 h-56 object-contain"
+                    style="image-rendering: pixelated;"
+                />
+            </div>
         </figure>
 
         <div class="card-body">
@@ -35,15 +37,15 @@
 
             <div class="grid grid-cols-3 gap-1 text-xs text-center mb-2">
                 <div class="stat p-1">
-                    <div class="stat-title text-xs">HP IV</div>
+                    <div class="stat-title text-xs">HP</div>
                     <div class="stat-value text-sm"><%= profile.pokemon.statsIV.hp %></div>
                 </div>
                 <div class="stat p-1">
-                    <div class="stat-title text-xs">ATK IV</div>
+                    <div class="stat-title text-xs">ATK</div>
                     <div class="stat-value text-sm"><%= profile.pokemon.statsIV.atk %></div>
                 </div>
                 <div class="stat p-1">
-                    <div class="stat-title text-xs">DEF IV</div>
+                    <div class="stat-title text-xs">DEF</div>
                     <div class="stat-value text-sm"><%= profile.pokemon.statsIV.def %></div>
                 </div>
                 <div class="stat p-1">
