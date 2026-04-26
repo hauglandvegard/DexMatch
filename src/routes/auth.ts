@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 
 import { createUser, getUserByUsername } from '../models/User';
 import { loginSchema, registerSchema } from '../schemas/auth.schema';
+import { ConflictError } from '../errors';
 import logger from '../utils/logger';
 
 const router = Router();
@@ -46,8 +47,11 @@ router.post('/register', async (req, res) => {
         req.session.userId = userId;
         logger.info('New user registered', { username, userId });
         res.redirect('/swipe');
-    } catch (error: any) {
-        res.render('login', { error: error.message, activeTab: 'register' });
+    } catch (error) {
+        if (error instanceof ConflictError) {
+            return res.render('login', { error: error.message, activeTab: 'register' });
+        }
+        throw error;
     }
 });
 

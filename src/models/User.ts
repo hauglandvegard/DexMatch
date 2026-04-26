@@ -1,6 +1,7 @@
 import db from "../database";
 import { UserRow } from "../types/database.types";
 import { User } from "../types/user.types";
+import { ConflictError, NotFoundError } from "../errors";
 
 /**
  * Maps database row to User interface.
@@ -54,7 +55,7 @@ export function createUser(username: string, passwordHash: string): number {
         return info.lastInsertRowid as number;
     } catch (error: any) {
         if (error.code === "SQLITE_CONSTRAINT_UNIQUE") {
-            throw new Error(`Username "${username}" is already taken.`);
+            throw new ConflictError(`Username "${username}" is already taken.`);
         }
         throw error;
     }
@@ -91,7 +92,7 @@ export function updateUserRegionPreference(
 ): void {
     const result = updateRegionStmt.run(regionId, userId);
     if (result.changes === 0) {
-        throw new Error(`User with ID ${userId} not found.`);
+        throw new NotFoundError(`User with ID ${userId} not found.`);
     }
 }
 
@@ -106,7 +107,7 @@ export function updateUserThemePreference(
 ): void {
     const result = updateThemeStmt.run(themeId, userId);
     if (result.changes === 0) {
-        throw new Error(`User with ID ${userId} not found.`);
+        throw new NotFoundError(`User with ID ${userId} not found.`);
     }
 }
 
