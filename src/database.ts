@@ -1,12 +1,27 @@
-import path from 'path';
-import Database from 'better-sqlite3';
+import path from "path";
+import fs from "fs";
+import Database from "better-sqlite3";
 
-const dbPath = path.join(import.meta.dirname, 'database.sqlite');
-const db = new Database(dbPath, { verbose: console.log });
+import logger from "./utils/logger";
 
-db.pragma('foreign_keys = ON');
+const dbPath =
+    process.env.DB_PATH ||
+    path.join(__dirname, "..", "data", "database.sqlite");
 
-const initDB = () => {
+if (dbPath !== ":memory:") {
+    const dataDir = path.dirname(dbPath);
+    if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+    }
+}
+
+const db = new Database(dbPath);
+
+db.pragma("foreign_keys = ON");
+db.pragma("journal_mode = WAL");
+db.pragma("synchronous = NORMAL");
+
+export const initDB = () => {
     db.exec(`
         CREATE TABLE IF NOT EXISTS USERS (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -14,25 +29,25 @@ const initDB = () => {
             display_name TEXT,
             password_hash TEXT NOT NULL,
             region_id_pref INTEGER,
-            theme INTEGER DEFAULT 0
+            theme_id INTEGER DEFAULT 0
         );
 
         CREATE TABLE IF NOT EXISTS USER_TYPE_PREFS (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
-            type INTEGER NOT NULL,
+            type_id INTEGER NOT NULL,
             is_wanted BOOLEAN NOT NULL CHECK (is_wanted IN (0, 1)),
-            FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE
+            FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE,
+            UNIQUE(user_id, type_id)
         );
 
-        CREATE TABLE IF NOT EXISTS POKEMONS (
+        CREATE TABLE IF NOT EXISTS POKEMON (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             species_id INTEGER NOT NULL,
             name TEXT NOT NULL,
-            primary_type_id INTEGER,
-            secondary_type_id INTEGER,
-            area_id INTEGER,
-            gender STRING,
+            description TEXT NOT NULL DEFAULT '',
+            location_id INTEGER,
+            gender INTEGER,
             weight INTEGER,
             height INTEGER,
             level INTEGER,
@@ -53,13 +68,20 @@ const initDB = () => {
             is_liked BOOLEAN NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES USERS(id) ON DELETE CASCADE,
-            FOREIGN KEY (pokemon_id) REFERENCES POKEMONS(id) ON DELETE CASCADE,
+            FOREIGN KEY (pokemon_id) REFERENCES POKEMON(id) ON DELETE CASCADE,
             UNIQUE(user_id, pokemon_id)
         );
     `);
-    console.log("Database initialized successfully!");
+    logger.info("Database initialized successfully!");
 };
 
+// Run at import time so tables exist before any model calls db.prepare()
 initDB();
+
+// Graceful shutdown
+process.on("exit", () => db.close());
+process.on("SIGHUP", () => process.exit(128 + 1));
+process.on("SIGINT", () => process.exit(128 + 2));
+process.on("SIGTERM", () => process.exit(128 + 15));
 
 export default db;

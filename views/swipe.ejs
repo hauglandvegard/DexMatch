@@ -1,3 +1,69 @@
-<%#
-    The core interface where `match.js` fetches a pokémon to dislpay.
-%>
+<%# Core swiping interface — displays one Pokémon profile at a time %>
+<div class="flex flex-col items-center w-full max-w-md">
+
+    <div class="card bg-base-100 shadow-xl w-full border-4 border-[var(--color-pokemon-yellow)]">
+        <figure class="pt-10 flex justify-center">
+            <div class="w-80 h-80 flex-shrink-0 border-4 border-[var(--color-pokemon-yellow)] rounded-xl flex items-center justify-center bg-base-200">
+                <img
+                    src="<%= profile.pokemon.isShiny ? profile.shinySpriteUrl : profile.spriteUrl %>"
+                    alt="<%= profile.speciesName %>"
+                    class="w-72 h-72 object-contain"
+                    style="image-rendering: pixelated;"
+                />
+            </div>
+        </figure>
+
+        <div class="card-body">
+            <div class="flex items-center gap-2">
+                <h2 class="card-title text-2xl capitalize">
+                    <%= profile.pokemon.name %> the <%= profile.speciesName %>
+                </h2>
+                <% if (profile.pokemon.isShiny) { %>
+                    <span class="badge badge-warning">✨ Shiny</span>
+                <% } %>
+            </div>
+
+            <div class="flex flex-wrap gap-1 mb-2">
+                <span class="badge badge-outline">Lv. <%= profile.pokemon.level %></span>
+                <span class="badge badge-outline">
+                    <%= profile.pokemon.size.height / 10 %>m /
+                    <%= profile.pokemon.size.weight / 10 %>kg
+                </span>
+            </div>
+
+            <p class="text-base-content/70 text-sm italic">"<%= profile.pokemon.description %>"</p>
+
+            <div class="divider"></div>
+
+            <div class="grid grid-cols-3 gap-1 text-center mb-2">
+                <% [
+                    ['HP',     profile.pokemon.statsIV.hp],
+                    ['ATK',    profile.pokemon.statsIV.atk],
+                    ['DEF',    profile.pokemon.statsIV.def],
+                    ['SP.ATK', profile.pokemon.statsIV.spAtk],
+                    ['SP.DEF', profile.pokemon.statsIV.spDef],
+                    ['SPD',    profile.pokemon.statsIV.speed],
+                ].forEach(([label, val]) => { %>
+                <div class="stat p-1">
+                    <div class="stat-label"><%= label %></div>
+                    <div class="stat-val"><%= val %></div>
+                </div>
+                <% }); %>
+            </div>
+
+            <div class="card-actions justify-between mt-2">
+                <form method="POST" action="/swipe">
+                    <input type="hidden" name="pokemonId" value="<%= profile.pokemon.id %>" />
+                    <input type="hidden" name="liked" value="false" />
+                    <button class="btn btn-error btn-lg">✕ Pass</button>
+                </form>
+                <form method="POST" action="/swipe">
+                    <input type="hidden" name="pokemonId" value="<%= profile.pokemon.id %>" />
+                    <input type="hidden" name="liked" value="true" />
+                    <button class="btn btn-success btn-lg">♥ Like</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>

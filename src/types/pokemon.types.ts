@@ -6,37 +6,42 @@ export interface PokeStats {
     spDef: number;
     speed: number;
 }
-export interface PokeAttributes {
+export interface PokeSize {
     height: number;
     weight: number;
-    nature_id: number;
-    isLegendary: boolean;
-}
-
-export interface CleanSpeciesData {
-    id: number;
-    name: string;
-    attributs: PokeAttributes;
-    stats: PokeStats;
-    isLegendary: boolean;
-    evolvedLevel: number;
-    chanseForMale: number;
-    LocationIds: number[];
-}
-
-export interface Pokemon {
-    id: number;
-    name: string;
-    speciesId: number;
-    description: string;
-    level: number;
-    attributes: PokeAttributes;
-    statsIV: PokeStats;
-    isShiny: boolean;
 }
 
 export enum Gender {
     GENDERLESS = 0,
     MALE = 1,
-    FEMALE = 2
+    FEMALE = 2,
+}
+
+export interface DraftPokemon {
+    name: string;
+    speciesId: number;
+    description: string;
+    gender: Gender;
+    level: number;
+    size: PokeSize;
+    statsIV: PokeStats;
+    isShiny: boolean;
+    natureId: number;
+    locationId: number;
+}
+
+export interface Pokemon extends DraftPokemon {
+    id: number;
+}
+
+export interface CleanSpeciesData {
+    id: number;
+    name: string;
+    baseStats: PokeStats;
+    baseSize: PokeSize;
+    types: string[];
+    isLegendary: boolean;
+    minEvolvedLevel: number;
+    chanceForMale: number;
+    locationIds: number[];
 }

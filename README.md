@@ -1,5 +1,8 @@
-# DexMatch
-A dating app for Pokémon to find their true mate.
+![DexMatch](public/images/logo.svg)
+
+Gives sliding into your DM's a whole new meaning
+
+Check it out --> https://www.dexmatch.no
 
 ### Overview
 
@@ -130,7 +133,7 @@ erDiagram
         string display_name
         string password_hash
         int region_id_pref
-        int theme
+        int theme_id
     }
     
     USER_TYPE_PREFS {
@@ -144,8 +147,8 @@ erDiagram
         int id PK          
         int species_id
         string name
-        int area_id
-        string gender
+        int location_id
+        int gender
         int weight
         int height
         int level
@@ -161,9 +164,10 @@ erDiagram
     
     SWIPES {
         int id PK
-        int user_id FK
-        int pokemon_id FK
+        int user_id FK, UK
+        int pokemon_id FK, UK
         boolean is_liked
+        datetime created_at
     }
     
     USERS ||--o{ USER_TYPE_PREFS: has

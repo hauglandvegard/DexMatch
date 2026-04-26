@@ -7,7 +7,8 @@ describe('General Server Tests', () => {
         const response = await request(app).get('/');
 
         expect(response.status).toBe(200);
-        expect(response.text).toContain('Welcome to DexMatch');
+        expect(response.text).toContain('DexMatch');
+        expect(response.text).toContain('Login');
     });
 
     it('should return 404 for a route that does not exist', async () => {

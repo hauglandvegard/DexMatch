@@ -1,9 +1,66 @@
-<%#
-    This is the first thing a user sees. It contains a HTML form asking for login name.
+<%# Login / Register page %>
+<div class="flex flex-col items-center mt-8 w-full max-w-sm">
+    <img src="/images/logo.svg" alt="DexMatch" class="w-72 mb-6" />
+    <p class="text-base-content/60 mb-6">Gives sliding into your DM's a whole new meaning</p>
 
-    When "Submit" is clicked it sends a POST request to routs.js to log the user in or create a new account.
-%>
-<div class="text-center mt-20">
-    <h1 class="text-4xl font-bold text-primary">Welcome to DexMatch</h1>
-    <p class="mt-4 text-lg">This is the login screen</p>
+    <% if (error) { %>
+        <div class="alert mb-4 w-full bg-[var(--color-pokemon-red)]">
+            <span class="text-[var(--color-pokemon-white)]"><%= error %></span>
+        </div>
+    <% } %>
+
+    <div class="tabs tabs-boxed mb-6 w-full justify-center">
+        <a class="tab <%= activeTab === 'login' ? 'tab-active' : '' %>" data-tab="login">Login</a>
+        <a class="tab <%= activeTab === 'register' ? 'tab-active' : '' %>" data-tab="register">Register</a>
+    </div>
+
+    <div id="login-form" class="card bg-base-100 shadow-xl w-full <%= activeTab === 'login' ? '' : 'hidden' %>">
+        <div class="card-body">
+            <form method="POST" action="/login">
+                <div class="form-control mb-4">
+                    <label class="label"><span class="label-text">Username</span></label>
+                    <input type="text" name="username" class="input input-bordered" placeholder="ash_ketchum" required />
+                </div>
+                <div class="form-control mb-6">
+                    <label class="label"><span class="label-text">Password</span></label>
+                    <input type="password" name="password" class="input input-bordered" placeholder="••••••••" required />
+                </div>
+                <button class="btn btn-primary w-full">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="register-form" class="card bg-base-100 shadow-xl w-full <%= activeTab === 'register' ? '' : 'hidden' %>">
+        <div class="card-body">
+            <form method="POST" action="/register">
+                <div class="form-control mb-4">
+                    <label class="label"><span class="label-text">Username</span></label>
+                    <input type="text" name="username" class="input input-bordered" placeholder="ash_ketchum" required />
+                    <label class="label"><span class="label-text-alt text-base-content/50">3–20 chars, letters/numbers/underscores</span></label>
+                </div>
+                <div class="form-control mb-4">
+                    <label class="label"><span class="label-text">Display Name <span class="text-base-content/40">(optional)</span></span></label>
+                    <input type="text" name="displayName" class="input input-bordered" placeholder="Ash Ketchum" maxlength="30" />
+                </div>
+                <div class="form-control mb-6">
+                    <label class="label"><span class="label-text">Password</span></label>
+                    <input type="password" name="password" class="input input-bordered" placeholder="••••••••" required />
+                    <label class="label"><span class="label-text-alt text-base-content/50">Min 8 characters</span></label>
+                </div>
+                <button class="btn btn-primary w-full">Create Account</button>
+            </form>
+        </div>
+    </div>
 </div>
+
+<script>
+    document.querySelectorAll('.tab[data-tab]').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('tab-active'); });
+            this.classList.add('tab-active');
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById(this.dataset.tab + '-form').classList.remove('hidden');
+        });
+    });
+</script>

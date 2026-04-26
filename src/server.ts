@@ -1,5 +1,9 @@
-import { app } from './app';
-import logger from './utils/logger';
+import { initDB } from "./database";
+
+initDB();
+
+import { app } from "./app";
+import logger from "./utils/logger";
 
 const PORT = process.env.PORT || 3000;
 
