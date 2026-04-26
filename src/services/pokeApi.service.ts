@@ -89,6 +89,34 @@ export function fetchRegionById(regionId: number) {
     );
 }
 
+function extractIdFromUrl(url: string): number {
+    const parts = url.split('/').filter(Boolean);
+    return parseInt(parts[parts.length - 1], 10);
+}
+
+export async function fetchRegionSpeciesIds(regionId: number): Promise<Set<number>> {
+    const region = await safeFetch(
+        () => P.getRegionByName(regionId),
+        `Failed to fetch region ${regionId}`,
+    ) as any;
+    if (!region?.pokedexes?.length) return new Set();
+
+    const pokedexes = await Promise.all(
+        region.pokedexes.map((pdx: { url: string }) =>
+            safeFetch(() => P.getResource(pdx.url), `Failed to fetch pokedex ${pdx.url}`)
+        )
+    ) as any[];
+
+    const ids = new Set<number>();
+    for (const pdx of pokedexes) {
+        if (!pdx?.pokemon_entries) continue;
+        for (const entry of pdx.pokemon_entries) {
+            ids.add(extractIdFromUrl(entry.pokemon_species.url));
+        }
+    }
+    return ids;
+}
+
 export async function fetchTypeList(): Promise<PokeType[]> {
     const result = await safeFetch(
         () => P.getTypesList({ limit: 20 }),
