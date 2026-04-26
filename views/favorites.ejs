@@ -1,6 +1,67 @@
-<%#
-    This displays the area where you can see the pokémons you have liked.
+<%# Liked Pokémon collection — displays all profiles the user has swiped right on %>
+<div class="w-full max-w-4xl px-4">
 
-    From requirements:
-    TODO: there will be a place in the app to see liked pokemon. Disliked pokemon shouldn’t appear again.
-%>
+    <h1 class="text-3xl font-pokemon text-[var(--color-pokemon-yellow)] mb-6 text-center">Your Matches</h1>
+
+    <% if (profiles.length === 0) { %>
+        <div class="flex flex-col items-center gap-4 mt-16 text-base-content/50">
+            <p class="text-xl">No matches yet.</p>
+            <a href="/swipe" class="btn btn-warning font-pokemon">Start Swiping</a>
+        </div>
+    <% } else { %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <% profiles.forEach(function(profile) { %>
+                <div class="card bg-base-100 shadow-xl border-2 border-[var(--color-pokemon-yellow)]">
+                    <figure class="pt-6 flex justify-center">
+                        <div class="w-36 h-36 flex items-center justify-center bg-base-200 rounded-xl border-2 border-[var(--color-pokemon-yellow)]">
+                            <img
+                                src="<%= profile.pokemon.isShiny ? profile.shinySpriteUrl : profile.spriteUrl %>"
+                                alt="<%= profile.speciesName %>"
+                                class="w-32 h-32 object-contain"
+                                style="image-rendering: pixelated;"
+                            />
+                        </div>
+                    </figure>
+
+                    <div class="card-body p-4">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h2 class="card-title text-base capitalize">
+                                <%= profile.pokemon.name %> the <%= profile.speciesName %>
+                            </h2>
+                            <% if (profile.pokemon.isShiny) { %>
+                                <span class="badge badge-warning badge-sm">✨</span>
+                            <% } %>
+                        </div>
+
+                        <div class="flex flex-wrap gap-1">
+                            <span class="badge badge-outline badge-sm">Lv. <%= profile.pokemon.level %></span>
+                            <span class="badge badge-outline badge-sm">
+                                <%= profile.pokemon.size.height / 10 %>m /
+                                <%= profile.pokemon.size.weight / 10 %>kg
+                            </span>
+                        </div>
+
+                        <p class="text-base-content/60 text-xs italic mt-1 line-clamp-2">"<%= profile.pokemon.description %>"</p>
+
+                        <div class="grid grid-cols-3 gap-1 text-center mt-2">
+                            <% [
+                                ['HP',  profile.pokemon.statsIV.hp],
+                                ['ATK', profile.pokemon.statsIV.atk],
+                                ['DEF', profile.pokemon.statsIV.def],
+                                ['SP.A', profile.pokemon.statsIV.spAtk],
+                                ['SP.D', profile.pokemon.statsIV.spDef],
+                                ['SPD', profile.pokemon.statsIV.speed],
+                            ].forEach(function(stat) { %>
+                                <div class="stat p-0.5">
+                                    <div class="stat-label text-xs"><%= stat[0] %></div>
+                                    <div class="stat-value text-sm"><%= stat[1] %></div>
+                                </div>
+                            <% }); %>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    <% } %>
+
+</div>

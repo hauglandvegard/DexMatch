@@ -25,6 +25,7 @@
         </div>
         <% if (locals.currentUser) { %>
         <div class="flex-none gap-3 items-center pr-2">
+            <a href="/favorites" class="btn btn-ghost btn-sm text-xs font-pokemon">♥ Matches</a>
             <span class="text-xs font-pokemon text-base-content/70 capitalize">
                 <%= currentUser.displayName || currentUser.username %>
             </span>
