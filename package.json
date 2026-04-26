@@ -1,60 +1,62 @@
 {
-  "name": "dexmatch",
-  "version": "1.0.0",
-  "description": "A dating app for Pokémon to find their true mate.",
-  "main": "index.js",
-  "scripts": {
-    "dev": "concurrently \"npm run start-server\" \"npm run start-sync\"",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "test": "jest --verbose",
-    "start-server": "tsx watch src/server.ts",
-    "start-sync": "browser-sync start --proxy 'localhost:3000' --files 'src/**/*.ts, views/**/*.ejs, public/**/*' --port 3001"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hauglandvegard/DexMatch.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/hauglandvegard/DexMatch/issues"
-  },
-  "homepage": "https://github.com/hauglandvegard/DexMatch#readme",
-  "dependencies": {
-    "@faker-js/faker": "^10.4.0",
-    "axios": "^1.15.2",
-    "bcryptjs": "^3.0.3",
-    "better-sqlite3": "^12.9.0",
-    "ejs": "^5.0.2",
-    "express": "^5.2.1",
-    "express-ejs-layouts": "^2.5.1",
-    "express-session": "^1.19.0",
-    "morgan": "^1.10.1",
-    "pokedex-promise-v2": "^4.2.1",
-    "winston": "^3.19.0",
-    "zod": "^4.3.6"
-  },
-  "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
-    "@types/better-sqlite3": "^7.6.13",
-    "@types/express": "^5.0.6",
-    "@types/express-ejs-layouts": "^2.5.4",
-    "@types/express-session": "^1.19.0",
-    "@types/jest": "^30.0.0",
-    "@types/morgan": "^1.9.10",
-    "@types/node": "^25.6.0",
-    "@types/supertest": "^7.2.0",
-    "browser-sync": "^3.0.4",
-    "concurrently": "^9.2.1",
-    "jest": "^30.3.0",
-    "nodemon": "^3.1.14",
-    "supertest": "^7.2.2",
-    "ts-jest": "^29.4.9",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.21.0",
-    "typescript": "^6.0.3"
-  }
+    "name": "dexmatch",
+    "version": "0.3.5",
+    "description": "A dating app for Pokémon to find their true mate.",
+    "main": "index.js",
+    "scripts": {
+        "dev": "concurrently \"npm run start-server\" \"npm run start-sync\"",
+        "build": "tsc",
+        "start": "node dist/server.js",
+        "test": "jest --verbose",
+        "start-server": "tsx watch src/server.ts",
+        "start-sync": "browser-sync start --proxy 'localhost:3000' --files 'src/**/*.ts, views/**/*.ejs, public/**/*' --port 3001"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/hauglandvegard/DexMatch.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "commonjs",
+    "bugs": {
+        "url": "https://github.com/hauglandvegard/DexMatch/issues"
+    },
+    "homepage": "https://github.com/hauglandvegard/DexMatch#readme",
+    "dependencies": {
+        "@faker-js/faker": "^10.4.0",
+        "axios": "^1.15.2",
+        "bcryptjs": "^3.0.3",
+        "better-sqlite3": "^12.9.0",
+        "ejs": "^5.0.2",
+        "express": "^5.2.1",
+        "express-ejs-layouts": "^2.5.1",
+        "express-session": "^1.19.0",
+        "helmet": "^8.1.0",
+        "morgan": "^1.10.1",
+        "pokedex-promise-v2": "^4.2.1",
+        "winston": "^3.19.0",
+        "zod": "^4.3.6"
+    },
+    "devDependencies": {
+        "@types/bcryptjs": "^2.4.6",
+        "@types/better-sqlite3": "^7.6.13",
+        "@types/express": "^5.0.6",
+        "@types/express-ejs-layouts": "^2.5.4",
+        "@types/express-session": "^1.19.0",
+        "@types/helmet": "^0.0.48",
+        "@types/jest": "^30.0.0",
+        "@types/morgan": "^1.9.10",
+        "@types/node": "^25.6.0",
+        "@types/supertest": "^7.2.0",
+        "browser-sync": "^3.0.4",
+        "concurrently": "^9.2.1",
+        "jest": "^30.3.0",
+        "nodemon": "^3.1.14",
+        "supertest": "^7.2.2",
+        "ts-jest": "^29.4.9",
+        "ts-node": "^10.9.2",
+        "tsx": "^4.21.0",
+        "typescript": "^6.0.3"
+    }
 }
