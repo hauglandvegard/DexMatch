@@ -41,7 +41,7 @@ export async function seedPool(targetSize: number = POOL_SIZE): Promise<void> {
 async function pickNextCandidate(userId: number): Promise<Pokemon | undefined> {
     const wantedTypeIds = getWantedTypeIds(userId);
     const regionId = getUserById(userId)?.regionIdPref ?? null;
-    const hasFilters = wantedTypeIds.length > 0 || regionId !== null;
+    const hasFilters = wantedTypeIds.length > 0 || (regionId !== null && regionId > 0);
 
     if (!hasFilters) return getUnswipedPokemon(userId);
 

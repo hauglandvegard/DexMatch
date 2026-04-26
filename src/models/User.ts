@@ -92,7 +92,7 @@ export function getUserById(id: number): User | undefined {
  */
 export function updateUserRegionPreference(
     userId: number,
-    regionId: number,
+    regionId: number | null,
 ): void {
     const result = updateRegionStmt.run(regionId, userId);
     if (result.changes === 0) {
