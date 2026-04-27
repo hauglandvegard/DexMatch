@@ -1,0 +1,8 @@
+<%# Shown while the pokemon queue is being generated %>
+<div class="flex flex-col items-center justify-center gap-6 mt-16">
+    <div class="loading loading-spinner loading-lg text-[var(--color-pokemon-yellow)]"></div>
+    <p class="text-base-content/60">Finding your next match...</p>
+</div>
+<script>
+    setTimeout(function() { window.location.href = '/swipe'; }, 1500);
+</script>

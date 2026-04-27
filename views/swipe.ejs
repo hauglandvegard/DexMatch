@@ -64,12 +64,10 @@
 
             <div class="card-actions justify-between mt-2">
                 <form method="POST" action="/swipe">
-                    <input type="hidden" name="pokemonId" value="<%= profile.pokemon.id %>" />
                     <input type="hidden" name="liked" value="false" />
                     <button class="btn btn-error btn-lg">✕ Pass</button>
                 </form>
                 <form method="POST" action="/swipe">
-                    <input type="hidden" name="pokemonId" value="<%= profile.pokemon.id %>" />
                     <input type="hidden" name="liked" value="true" />
                     <button class="btn btn-success btn-lg">♥ Like</button>
                 </form>
