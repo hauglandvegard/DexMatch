@@ -41,14 +41,6 @@
                         <p class="text-base-content/50 text-xs capitalize -mt-1">the <%= profile.speciesName %></p>
 
                         <div class="flex flex-wrap gap-1 justify-center mt-1">
-                            <% if (profile.types && profile.types.length > 0) { %>
-                                <% profile.types.forEach(function(type) { %>
-                                    <span class="badge badge-sm type-<%= type %> capitalize"><%= type %></span>
-                                <% }); %>
-                            <% } %>
-                        </div>
-
-                        <div class="flex flex-wrap gap-1 justify-center mt-1">
                             <span class="badge badge-outline badge-sm">Lv. <%= profile.pokemon.level %></span>
                             <span class="badge badge-outline badge-sm">
                                 <%= profile.pokemon.size.height / 10 %>m /
@@ -56,7 +48,15 @@
                             </span>
                         </div>
 
-                        <p class="text-base-content/60 text-xs italic mt-1 line-clamp-2">"<%= profile.pokemon.description %>"</p>
+                        <div class="flex flex-wrap gap-1 justify-center mt-1">
+                            <% if (profile.types && profile.types.length > 0) { %>
+                                <% profile.types.forEach(function(type) { %>
+                                    <span class="badge badge-sm type-<%= type %> capitalize"><%= type %></span>
+                                <% }); %>
+                            <% } %>
+                        </div>
+
+                        <p class="text-base-content/60 text-xs italic mt-1 line-clamp-2 px-4">"<%= profile.pokemon.description %>"</p>
 
                         <div class="grid grid-cols-3 gap-1 text-center mt-2 w-full">
                             <% [

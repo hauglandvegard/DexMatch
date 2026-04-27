@@ -120,7 +120,7 @@ router.post('/preferences', requireAuth, async (req, res) => {
         invalidateQueue(userId);
         fillQueueInBackground(userId);
 
-        res.redirect('/preferences');
+        res.redirect('/swipe');
     } catch (error) {
         logger.error('Failed to save preferences', error);
         res.status(500).send('Failed to save preferences. Please try again.');
