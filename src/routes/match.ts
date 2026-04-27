@@ -1,49 +1,70 @@
 import { Router } from 'express';
 
 import { requireAuth } from '../middleware/auth';
-import { getNextPokemon, getLikedProfiles } from '../services/pokeService';
+import { buildProfileFromQueued, getLikedProfiles } from '../services/pokeService';
+import { popQueue, fillQueueInBackground, invalidateQueue } from '../services/pokeQueue';
 import { fetchTypeList, fetchRegionList } from '../services/pokeApi.service';
-import { createSwipe } from '../models/Swipe';
-import { getPokemonById } from '../models/Pokemon';
+import { createSwipe, deleteSwipe } from '../models/Swipe';
+import { insertPokemon, deletePokemon, getPokemonById } from '../models/Pokemon';
 import { getWantedTypeIds, setUserTypePreference, updateUserRegionPreference, getUserById } from '../models/User';
 import logger from '../utils/logger';
 
 const router = Router();
 
-router.get('/swipe', requireAuth, async (req, res) => {
+router.get('/swipe', requireAuth, (req, res) => {
     res.setHeader('Cache-Control', 'no-store');
     const userId = req.session.userId!;
-    try {
-        res.locals.profile = await getNextPokemon(userId);
-        res.render('swipe');
-    } catch (error) {
-        logger.error('Failed to load pokemon profile', error);
-        res.status(500).send('Failed to load a Pokémon. Please try again.');
+
+    const queued = popQueue(userId);
+    fillQueueInBackground(userId);
+
+    if (!queued) {
+        return res.render('swipe-loading');
     }
+
+    req.session.pendingProfile = queued;
+    res.locals.profile = buildProfileFromQueued(queued);
+    res.render('swipe');
 });
 
 router.post('/swipe', requireAuth, (req, res) => {
     const userId = req.session.userId!;
-    const pokemonId = Number(req.body.pokemonId);
     const isLiked = req.body.liked === 'true';
+    const pending = req.session.pendingProfile;
+
+    req.session.pendingProfile = undefined;
+
+    if (!pending) {
+        return res.redirect('/swipe');
+    }
+
+    if (isLiked) {
+        try {
+            const pokemon = insertPokemon(pending.draft);
+            createSwipe(userId, pokemon.id, true);
+            logger.debug('Like recorded', { userId, speciesId: pending.draft.speciesId });
+        } catch (error) {
+            logger.error('Failed to record like', { userId, error });
+        }
+    }
+
+    res.redirect('/swipe');
+});
+
+router.post('/favorites/remove', requireAuth, (req, res) => {
+    const userId = req.session.userId!;
+    const pokemonId = Number(req.body.pokemonId);
 
     if (!Number.isInteger(pokemonId) || pokemonId <= 0) {
         return res.status(400).send('Invalid pokemonId.');
     }
 
     const pokemon = getPokemonById(pokemonId);
-    if (!pokemon) {
-        return res.status(404).send('Pokémon not found.');
-    }
+    if (!pokemon) return res.redirect('/favorites');
 
-    try {
-        createSwipe(userId, pokemonId, isLiked);
-        logger.debug('Swipe recorded', { userId, pokemonId, isLiked });
-    } catch (error) {
-        logger.error('Failed to record swipe', { userId, pokemonId, error });
-        return res.status(500).send('Failed to record swipe. Please try again.');
-    }
-    res.redirect('/swipe');
+    deleteSwipe(userId, pokemonId);
+    deletePokemon(pokemonId);
+    res.redirect('/favorites');
 });
 
 router.get('/favorites', requireAuth, async (req, res) => {
@@ -95,7 +116,11 @@ router.post('/preferences', requireAuth, async (req, res) => {
             setUserTypePreference(userId, type.id, checkedIds.has(type.id));
         }
         updateUserRegionPreference(userId, regionId && regionId > 0 ? regionId : null);
-        res.redirect('/preferences');
+
+        invalidateQueue(userId);
+        fillQueueInBackground(userId);
+
+        res.redirect('/swipe');
     } catch (error) {
         logger.error('Failed to save preferences', error);
         res.status(500).send('Failed to save preferences. Please try again.');

@@ -45,3 +45,8 @@ export interface CleanSpeciesData {
     chanceForMale: number;
     locationIds: number[];
 }
+
+export interface QueuedProfile {
+    draft: DraftPokemon;
+    speciesData: CleanSpeciesData;
+}

@@ -2,9 +2,6 @@ import db from "../database";
 import { Pokemon, DraftPokemon } from "../types/pokemon.types";
 import { PokemonRow } from "../types/database.types";
 
-/**
- * Maps DB row to Pokemon interface.
- */
 function mapPokemon(row: PokemonRow): Pokemon {
     return {
         id: row.id,
@@ -31,7 +28,6 @@ function mapPokemon(row: PokemonRow): Pokemon {
     };
 }
 
-// Prepared statements for production performance
 const insertStmt = db.prepare(`
     INSERT INTO POKEMON (
         species_id, name, description, location_id, gender,
@@ -42,15 +38,6 @@ const insertStmt = db.prepare(`
 
 const selectByIdStmt = db.prepare("SELECT * FROM POKEMON WHERE id = ?");
 
-const selectUnswipedStmt = db.prepare(`
-    SELECT * FROM POKEMON
-    WHERE id NOT IN (SELECT pokemon_id FROM SWIPES WHERE user_id = ?)
-    ORDER BY RANDOM()
-    LIMIT 1
-`);
-
-const countStmt = db.prepare("SELECT COUNT(*) as count FROM POKEMON");
-
 const selectLikedStmt = db.prepare(`
     SELECT p.* FROM POKEMON p
     INNER JOIN SWIPES s ON s.pokemon_id = p.id
@@ -58,16 +45,8 @@ const selectLikedStmt = db.prepare(`
     ORDER BY s.created_at DESC
 `);
 
-const selectAllUnswipedStmt = db.prepare(`
-    SELECT * FROM POKEMON
-    WHERE id NOT IN (SELECT pokemon_id FROM SWIPES WHERE user_id = ?)
-`);
+const deleteByIdStmt = db.prepare("DELETE FROM POKEMON WHERE id = ?");
 
-/**
- * Insert Pokemon → DB.
- * @param draftPokemon - The draft pokemon data.
- * @returns The inserted pokemon with its ID.
- */
 export function insertPokemon(draftPokemon: DraftPokemon): Pokemon {
     const info = insertStmt.run(
         draftPokemon.speciesId,
@@ -87,11 +66,7 @@ export function insertPokemon(draftPokemon: DraftPokemon): Pokemon {
         draftPokemon.statsIV.speed,
         draftPokemon.isShiny ? 1 : 0,
     );
-
-    return {
-        ...draftPokemon,
-        id: info.lastInsertRowid as number,
-    };
+    return { ...draftPokemon, id: info.lastInsertRowid as number };
 }
 
 export function getPokemonById(id: number): Pokemon | undefined {
@@ -99,22 +74,11 @@ export function getPokemonById(id: number): Pokemon | undefined {
     return row ? mapPokemon(row) : undefined;
 }
 
-export function getUnswipedPokemon(userId: number): Pokemon | undefined {
-    const row = selectUnswipedStmt.get(userId) as PokemonRow | undefined;
-    return row ? mapPokemon(row) : undefined;
-}
-
-export function getPokemonCount(): number {
-    const row = countStmt.get() as { count: number };
-    return row.count;
-}
-
-export function getAllUnswipedPokemon(userId: number): Pokemon[] {
-    const rows = selectAllUnswipedStmt.all(userId) as PokemonRow[];
-    return rows.map(mapPokemon);
-}
-
 export function getLikedPokemon(userId: number): Pokemon[] {
     const rows = selectLikedStmt.all(userId) as PokemonRow[];
     return rows.map(mapPokemon);
+}
+
+export function deletePokemon(id: number): void {
+    deleteByIdStmt.run(id);
 }

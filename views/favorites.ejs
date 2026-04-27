@@ -11,7 +11,13 @@
     <% } else { %>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <% profiles.forEach(function(profile) { %>
-                <div class="card bg-base-100 shadow-xl border-2 border-[var(--color-pokemon-yellow)]">
+                <div class="card bg-base-100 shadow-xl border-2 border-[var(--color-pokemon-yellow)] relative">
+
+                    <form method="POST" action="/favorites/remove" class="absolute top-2 right-2">
+                        <input type="hidden" name="pokemonId" value="<%= profile.pokemon.id %>" />
+                        <button type="submit" class="btn btn-sm btn-circle btn-error opacity-60 hover:opacity-100">✕</button>
+                    </form>
+
                     <figure class="pt-6 flex justify-center">
                         <div class="w-36 h-36 flex items-center justify-center bg-base-200 rounded-xl border-2 border-[var(--color-pokemon-yellow)]">
                             <img
@@ -23,17 +29,18 @@
                         </div>
                     </figure>
 
-                    <div class="card-body p-4">
-                        <div class="flex items-center gap-2 flex-wrap">
+                    <div class="card-body p-4 items-center text-center">
+                        <div class="flex items-center gap-2 flex-wrap justify-center">
                             <h2 class="card-title text-base capitalize">
-                                <%= profile.pokemon.name %> the <%= profile.speciesName %>
+                                <%= profile.pokemon.name %>
                             </h2>
                             <% if (profile.pokemon.isShiny) { %>
                                 <span class="badge badge-warning badge-sm">✨</span>
                             <% } %>
                         </div>
+                        <p class="text-base-content/50 text-xs capitalize -mt-1">the <%= profile.speciesName %></p>
 
-                        <div class="flex flex-wrap gap-1">
+                        <div class="flex flex-wrap gap-1 justify-center mt-1">
                             <span class="badge badge-outline badge-sm">Lv. <%= profile.pokemon.level %></span>
                             <span class="badge badge-outline badge-sm">
                                 <%= profile.pokemon.size.height / 10 %>m /
@@ -41,9 +48,17 @@
                             </span>
                         </div>
 
-                        <p class="text-base-content/60 text-xs italic mt-1 line-clamp-2">"<%= profile.pokemon.description %>"</p>
+                        <div class="flex flex-wrap gap-1 justify-center mt-1">
+                            <% if (profile.types && profile.types.length > 0) { %>
+                                <% profile.types.forEach(function(type) { %>
+                                    <span class="badge badge-sm type-<%= type %> capitalize"><%= type %></span>
+                                <% }); %>
+                            <% } %>
+                        </div>
 
-                        <div class="grid grid-cols-3 gap-1 text-center mt-2">
+                        <p class="text-base-content/60 text-xs italic mt-1 line-clamp-2 px-4">"<%= profile.pokemon.description %>"</p>
+
+                        <div class="grid grid-cols-3 gap-1 text-center mt-2 w-full">
                             <% [
                                 ['HP',  profile.pokemon.statsIV.hp],
                                 ['ATK', profile.pokemon.statsIV.atk],
