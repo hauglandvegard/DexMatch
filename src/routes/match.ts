@@ -4,8 +4,8 @@ import { requireAuth } from '../middleware/auth';
 import { buildProfileFromQueued, getLikedProfiles } from '../services/pokeService';
 import { popQueue, fillQueueInBackground, invalidateQueue } from '../services/pokeQueue';
 import { fetchTypeList, fetchRegionList } from '../services/pokeApi.service';
-import { createSwipe } from '../models/Swipe';
-import { insertPokemon } from '../models/Pokemon';
+import { createSwipe, deleteSwipe } from '../models/Swipe';
+import { insertPokemon, deletePokemon, getPokemonById } from '../models/Pokemon';
 import { getWantedTypeIds, setUserTypePreference, updateUserRegionPreference, getUserById } from '../models/User';
 import logger from '../utils/logger';
 
@@ -49,6 +49,22 @@ router.post('/swipe', requireAuth, (req, res) => {
     }
 
     res.redirect('/swipe');
+});
+
+router.post('/favorites/remove', requireAuth, (req, res) => {
+    const userId = req.session.userId!;
+    const pokemonId = Number(req.body.pokemonId);
+
+    if (!Number.isInteger(pokemonId) || pokemonId <= 0) {
+        return res.status(400).send('Invalid pokemonId.');
+    }
+
+    const pokemon = getPokemonById(pokemonId);
+    if (!pokemon) return res.redirect('/favorites');
+
+    deleteSwipe(userId, pokemonId);
+    deletePokemon(pokemonId);
+    res.redirect('/favorites');
 });
 
 router.get('/favorites', requireAuth, async (req, res) => {

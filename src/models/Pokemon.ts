@@ -45,6 +45,8 @@ const selectLikedStmt = db.prepare(`
     ORDER BY s.created_at DESC
 `);
 
+const deleteByIdStmt = db.prepare("DELETE FROM POKEMON WHERE id = ?");
+
 export function insertPokemon(draftPokemon: DraftPokemon): Pokemon {
     const info = insertStmt.run(
         draftPokemon.speciesId,
@@ -75,4 +77,8 @@ export function getPokemonById(id: number): Pokemon | undefined {
 export function getLikedPokemon(userId: number): Pokemon[] {
     const rows = selectLikedStmt.all(userId) as PokemonRow[];
     return rows.map(mapPokemon);
+}
+
+export function deletePokemon(id: number): void {
+    deleteByIdStmt.run(id);
 }

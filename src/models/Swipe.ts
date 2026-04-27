@@ -21,6 +21,10 @@ const insertSwipeStmt = db.prepare(
 
 const selectByUserIdStmt = db.prepare("SELECT * FROM SWIPES WHERE user_id = ?");
 
+const deleteSwipeStmt = db.prepare(
+    "DELETE FROM SWIPES WHERE user_id = ? AND pokemon_id = ?",
+);
+
 /**
  * Insert Swipe → DB.
  * @param userId - User ID.
@@ -45,4 +49,8 @@ export function createSwipe(
 export function getSwipesByUserId(userId: number): Swipe[] {
     const rows = selectByUserIdStmt.all(userId) as SwipeRow[];
     return rows.map(mapSwipe);
+}
+
+export function deleteSwipe(userId: number, pokemonId: number): void {
+    deleteSwipeStmt.run(userId, pokemonId);
 }
