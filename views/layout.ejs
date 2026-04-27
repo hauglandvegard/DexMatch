@@ -24,16 +24,40 @@
             </a>
         </div>
         <% if (locals.currentUser) { %>
-        <div class="flex-none gap-3 items-center pr-2">
+        <%# Desktop nav %>
+        <div class="hidden sm:flex flex-none gap-3 items-center pr-2">
             <a href="/swipe" class="btn btn-ghost btn-sm text-xs font-pokemon">Swipe</a>
-            <a href="/favorites" class="btn btn-ghost btn-sm text-xs font-pokemon">♥ Matches</a>
-            <a href="/preferences" class="btn btn-ghost btn-sm text-xs font-pokemon">⚙ Prefs</a>
+            <a href="/favorites" class="btn btn-ghost btn-sm text-xs font-pokemon">Matches</a>
+            <a href="/preferences" class="btn btn-ghost btn-sm text-xs font-pokemon">Prefs</a>
             <span class="text-xs font-pokemon text-base-content/70 capitalize">
                 <%= currentUser.displayName || currentUser.username %>
             </span>
             <form method="POST" action="/logout">
                 <button class="btn btn-ghost btn-sm text-xs font-pokemon">Logout</button>
             </form>
+        </div>
+        <%# Mobile hamburger %>
+        <div class="sm:hidden dropdown dropdown-end">
+            <button tabindex="0" class="btn btn-ghost btn-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+            <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box shadow-xl w-44 mt-2 p-2 gap-1 z-50">
+                <li><a href="/swipe" class="font-pokemon text-xs">Swipe</a></li>
+                <li><a href="/favorites" class="font-pokemon text-xs">Matches</a></li>
+                <li><a href="/preferences" class="font-pokemon text-xs">Prefs</a></li>
+                <li class="border-t border-base-200 pt-1 mt-1">
+                    <span class="font-pokemon text-xs text-base-content/50 capitalize px-3">
+                        <%= currentUser.displayName || currentUser.username %>
+                    </span>
+                </li>
+                <li>
+                    <form method="POST" action="/logout">
+                        <button class="font-pokemon text-xs w-full text-left px-3 py-2">Logout</button>
+                    </form>
+                </li>
+            </ul>
         </div>
         <% } %>
     </div>
