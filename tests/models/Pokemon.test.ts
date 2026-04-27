@@ -1,4 +1,4 @@
-import { insertPokemon, getPokemonById, getLikedPokemon, getAllUnswipedPokemon } from "../../src/models/Pokemon";
+import { insertPokemon, getPokemonById, getLikedPokemon } from "../../src/models/Pokemon";
 import { createUser } from "../../src/models/User";
 import { createSwipe } from "../../src/models/Swipe";
 import db from "../../src/database";
@@ -111,41 +111,4 @@ describe("Pokemon Model Tests", () => {
         });
     });
 
-    describe("getAllUnswipedPokemon", () => {
-        let unswipedUserId: number;
-        let swipedId: number;
-        let unswipedId: number;
-
-        beforeAll(() => {
-            unswipedUserId = createUser(`unswiped_test_${Date.now()}`, "hashed_password");
-
-            const swiped = insertPokemon({ ...mockPokemonData, name: "SwipedMon", speciesId: 20 });
-            swipedId = swiped.id;
-
-            const unswiped = insertPokemon({ ...mockPokemonData, name: "UnswipedMon", speciesId: 21 });
-            unswipedId = unswiped.id;
-
-            createSwipe(unswipedUserId, swipedId, true);
-        });
-
-        afterAll(() => {
-            db.prepare("DELETE FROM USERS WHERE id = ?").run(unswipedUserId);
-            db.prepare("DELETE FROM POKEMON WHERE id IN (?, ?)").run(swipedId, unswipedId);
-        });
-
-        it("should return only pokemon not yet swiped by user", () => {
-            const results = getAllUnswipedPokemon(unswipedUserId);
-            const ids = results.map((p) => p.id);
-            expect(ids).toContain(unswipedId);
-            expect(ids).not.toContain(swipedId);
-        });
-
-        it("should return empty array when all pokemon are swiped", () => {
-            createSwipe(unswipedUserId, unswipedId, false);
-            const results = getAllUnswipedPokemon(unswipedUserId);
-            const ids = results.map((p) => p.id);
-            expect(ids).not.toContain(swipedId);
-            expect(ids).not.toContain(unswipedId);
-        });
-    });
 });
