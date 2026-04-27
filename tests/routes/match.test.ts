@@ -31,6 +31,7 @@ const mockProfile = {
         locationId: 0,
     },
     speciesName: 'pikachu',
+    types: ['electric'],
     spriteUrl: 'https://example.com/sprite.png',
     shinySpriteUrl: 'https://example.com/shiny.png',
 };

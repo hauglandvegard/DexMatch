@@ -13,6 +13,7 @@ const POOL_LOW_THRESHOLD = 5;
 export interface PokemonProfile {
     pokemon: Pokemon;
     speciesName: string;
+    types: string[];
     spriteUrl: string;
     shinySpriteUrl: string;
 }
@@ -131,13 +132,14 @@ export async function getNextPokemon(userId: number): Promise<PokemonProfile> {
     const speciesData = await buildCleanSpeciesData(pokemon.speciesId);
     if (!speciesData) throw new Error(`Failed to fetch data for species ${pokemon.speciesId}`);
 
-    return buildProfile(pokemon, speciesData.name);
+    return buildProfile(pokemon, speciesData.name, speciesData.types ?? []);
 }
 
-function buildProfile(pokemon: Pokemon, speciesName: string): PokemonProfile {
+function buildProfile(pokemon: Pokemon, speciesName: string, types: string[] = []): PokemonProfile {
     return {
         pokemon,
         speciesName,
+        types,
         spriteUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.speciesId}.png`,
         shinySpriteUrl: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.speciesId}.png`,
     };
@@ -148,7 +150,7 @@ export async function getLikedProfiles(userId: number): Promise<PokemonProfile[]
     const profiles = await Promise.all(
         liked.map(async (pokemon) => {
             const speciesData = await buildCleanSpeciesData(pokemon.speciesId);
-            return speciesData ? buildProfile(pokemon, speciesData.name) : null;
+            return speciesData ? buildProfile(pokemon, speciesData.name, speciesData.types ?? []) : null;
         })
     );
     return profiles.filter((p): p is PokemonProfile => p !== null);

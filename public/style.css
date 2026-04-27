@@ -43,6 +43,26 @@
     font-display: swap;
 }
 
+/* Pokémon type badge colors */
+.type-normal   { background:#a8a77a; color:#fff; border:none; }
+.type-fire     { background:#ee8130; color:#fff; border:none; }
+.type-water    { background:#6390f0; color:#fff; border:none; }
+.type-electric { background:#f7d02c; color:#333; border:none; }
+.type-grass    { background:#7ac74c; color:#fff; border:none; }
+.type-ice      { background:#96d9d6; color:#333; border:none; }
+.type-fighting { background:#c22e28; color:#fff; border:none; }
+.type-poison   { background:#a33ea1; color:#fff; border:none; }
+.type-ground   { background:#e2bf65; color:#333; border:none; }
+.type-flying   { background:#a98ff3; color:#fff; border:none; }
+.type-psychic  { background:#f95587; color:#fff; border:none; }
+.type-bug      { background:#a6b91a; color:#fff; border:none; }
+.type-rock     { background:#b6a136; color:#fff; border:none; }
+.type-ghost    { background:#735797; color:#fff; border:none; }
+.type-dragon   { background:#6f35fc; color:#fff; border:none; }
+.type-dark     { background:#705746; color:#fff; border:none; }
+.type-steel    { background:#b7b7ce; color:#333; border:none; }
+.type-fairy    { background:#d685ad; color:#fff; border:none; }
+
 @font-face {
     font-family: "PokemonSolid";
     src: url("/fonts/Pokemon Solid.ttf") format("truetype");

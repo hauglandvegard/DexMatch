@@ -2,7 +2,19 @@
 <div class="flex flex-col items-center w-full max-w-md">
 
     <div class="card bg-base-100 shadow-xl w-full border-4 border-[var(--color-pokemon-yellow)]">
-        <figure class="pt-10 flex justify-center">
+        <div class="px-6 pt-5 pb-2 flex flex-col items-center gap-1">
+            <h2 class="text-3xl font-bold capitalize text-center">
+                <%= profile.pokemon.name %>
+            </h2>
+            <div class="flex items-center gap-2">
+                <span class="text-base-content/60 text-sm capitalize">the <%= profile.speciesName %></span>
+                <% if (profile.pokemon.isShiny) { %>
+                    <span class="badge badge-warning badge-sm">✨ Shiny</span>
+                <% } %>
+            </div>
+        </div>
+
+        <figure class="flex justify-center">
             <div class="w-80 h-80 flex-shrink-0 border-4 border-[var(--color-pokemon-yellow)] rounded-xl flex items-center justify-center bg-base-200">
                 <img
                     src="<%= profile.pokemon.isShiny ? profile.shinySpriteUrl : profile.spriteUrl %>"
@@ -13,29 +25,24 @@
             </div>
         </figure>
 
-        <div class="card-body">
-            <div class="flex items-center gap-2">
-                <h2 class="card-title text-2xl capitalize">
-                    <%= profile.pokemon.name %> the <%= profile.speciesName %>
-                </h2>
-                <% if (profile.pokemon.isShiny) { %>
-                    <span class="badge badge-warning">✨ Shiny</span>
-                <% } %>
-            </div>
+        <div class="card-body pt-2">
 
-            <div class="flex flex-wrap gap-1 mb-2">
-                <span class="badge badge-outline">Lv. <%= profile.pokemon.level %></span>
-                <span class="badge badge-outline">
+            <div class="flex flex-wrap gap-2 mb-2 justify-center">
+                <span class="badge badge-outline badge-md">Lv. <%= profile.pokemon.level %></span>
+                <span class="badge badge-outline badge-md">
                     <%= profile.pokemon.size.height / 10 %>m /
                     <%= profile.pokemon.size.weight / 10 %>kg
                 </span>
             </div>
+            <% if (profile.types && profile.types.length > 0) { %>
+            <div class="flex flex-wrap gap-2 mb-4 justify-center">
+                <% profile.types.forEach(type => { %>
+                    <span class="badge badge-md type-<%= type %> capitalize"><%= type %></span>
+                <% }); %>
+            </div>
+            <% } %>
 
-            <p class="text-base-content/70 text-sm italic">"<%= profile.pokemon.description %>"</p>
-
-            <div class="divider"></div>
-
-            <div class="grid grid-cols-3 gap-1 text-center mb-2">
+            <div class="grid grid-cols-3 gap-1 text-center mb-1">
                 <% [
                     ['HP',     profile.pokemon.statsIV.hp],
                     ['ATK',    profile.pokemon.statsIV.atk],
@@ -50,6 +57,10 @@
                 </div>
                 <% }); %>
             </div>
+
+            <div class="divider"></div>
+
+            <p class="text-base-content/70 text-sm italic">"<%= profile.pokemon.description %>"</p>
 
             <div class="card-actions justify-between mt-2">
                 <form method="POST" action="/swipe">
