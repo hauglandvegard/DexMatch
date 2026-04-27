@@ -12,6 +12,7 @@ import logger from './utils/logger';
 import { getUserById } from './models/User';
 import authRouter from './routes/auth';
 import matchRouter from './routes/match';
+import healthRouter from './routes/health';
 
 const SqliteStore = SqliteStoreFactory(session);
 
@@ -79,6 +80,7 @@ app.get('/', (req, res) => {
     res.render('login');
 });
 
+app.use(healthRouter);
 app.use(authRouter);
 app.use(matchRouter);
 
