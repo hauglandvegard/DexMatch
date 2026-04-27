@@ -117,6 +117,24 @@ export async function fetchRegionSpeciesIds(regionId: number): Promise<Set<numbe
     return ids;
 }
 
+export async function fetchSpeciesIdsByTypes(typeNames: string[]): Promise<Set<number>> {
+    const results = await Promise.all(
+        typeNames.map((name) =>
+            safeFetch(() => P.getTypeByName(name), `Failed to fetch type ${name}`)
+        )
+    ) as any[];
+
+    const ids = new Set<number>();
+    for (const result of results) {
+        if (!result?.pokemon) continue;
+        for (const entry of result.pokemon) {
+            const id = extractIdFromUrl(entry.pokemon.url);
+            if (id >= 1 && id <= 898) ids.add(id);
+        }
+    }
+    return ids;
+}
+
 export async function fetchTypeList(): Promise<PokeType[]> {
     const result = await safeFetch(
         () => P.getTypesList({ limit: 20 }),

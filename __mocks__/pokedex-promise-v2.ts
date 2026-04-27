@@ -5,6 +5,7 @@ const Pokedex = jest.fn().mockImplementation(() => ({
     getRegionsList: jest.fn().mockResolvedValue(null),
     getRegionByName: jest.fn().mockResolvedValue(null),
     getTypesList: jest.fn().mockResolvedValue(null),
+    getTypeByName: jest.fn().mockResolvedValue(null),
 }));
 
 export default Pokedex;
