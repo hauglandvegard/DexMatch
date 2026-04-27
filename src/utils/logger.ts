@@ -1,4 +1,7 @@
+import fs from 'fs';
 import winston from 'winston';
+
+if (!fs.existsSync('logs')) fs.mkdirSync('logs');
 
 const logger = winston.createLogger({
     level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
