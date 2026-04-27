@@ -1,4 +1,4 @@
-![DexMatch](public/images/logo.svg)
+![DexMatch](public/images/logo.png)
 
 Gives sliding into your DM's a whole new meaning
 
